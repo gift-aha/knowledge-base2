@@ -1,245 +1,512 @@
-/* ==================== 移动端优化样式 ==================== */
-/* 导入到现有项目，或者与现有style.css合并 */
+/* mobile.css - 移动端优化样式 */
 
-/* 移动端基础优化 */
-@media (max-width: 768px) {
-    /* 重置基础布局 */
+/* ==================== 通用移动端样式 ==================== */
+@media (max-width: 1024px) {
+    .desktop-only {
+        display: none !important;
+    }
+    
     body {
+        padding-bottom: 60px; /* 为底部导航留出空间 */
         overflow-x: hidden;
         -webkit-overflow-scrolling: touch;
-        height: 100vh;
-        height: -webkit-fill-available;
     }
     
     .main-container {
         flex-direction: column;
-        overflow-x: hidden;
-        height: calc(100vh - 60px);
-        padding-top: 60px; /* 为顶部固定导航栏留出空间 */
-    }
-    
-    /* 隐藏桌面端元素 */
-    .sidebar {
-        display: none;
-    }
-    
-    .right-panel {
-        display: none;
-    }
-    
-    /* 移动端顶部固定导航栏 */
-    .mobile-header {
-        display: flex;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 60px;
-        background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
-        color: white;
-        padding: 0 15px;
-        z-index: 1000;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        align-items: center;
-    }
-    
-    .mobile-header .logo {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex: 1;
-    }
-    
-    .mobile-header .logo-icon {
-        font-size: 22px;
-    }
-    
-    .mobile-header .logo-text {
-        font-size: 18px;
-        font-weight: 600;
-    }
-    
-    /* 移动端菜单按钮 */
-    .mobile-menu-btn {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 1.5rem;
-        padding: 8px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    /* 移动端底部导航栏 */
-    .mobile-bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 60px;
-        background-color: white;
-        border-top: 1px solid #e1e5eb;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        z-index: 1000;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-    }
-    
-    .mobile-nav-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 8px;
-        text-decoration: none;
-        color: #666;
-        font-size: 0.75rem;
-        flex: 1;
-        transition: all 0.2s;
-        border-radius: 8px;
-        margin: 0 5px;
-    }
-    
-    .mobile-nav-item.active {
-        color: var(--primary-color);
-        background-color: rgba(26, 35, 126, 0.05);
-    }
-    
-    .mobile-nav-item i {
-        font-size: 1.2rem;
-        margin-bottom: 4px;
-    }
-    
-    /* 移动端侧边菜单 */
-    .mobile-sidebar {
-        position: fixed;
-        top: 0;
-        left: -100%;
-        width: 85%;
-        max-width: 320px;
-        height: 100vh;
-        background-color: white;
-        z-index: 1100;
-        box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
-        transition: left 0.3s ease;
+        height: auto;
+        min-height: calc(100vh - 60px);
         overflow-y: auto;
-        padding-top: 60px; /* 为顶部栏留出空间 */
+        padding-top: 0;
     }
     
-    .mobile-sidebar.active {
-        left: 0;
+    .sidebar, .right-panel {
+        display: none !important;
     }
     
-    .mobile-sidebar-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1099;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-    
-    .mobile-sidebar-overlay.active {
-        opacity: 1;
-        visibility: visible;
-    }
-    
-    /* 移动端搜索栏 */
-    .mobile-search-bar {
-        position: fixed;
-        top: 60px;
-        left: 0;
-        right: 0;
-        background-color: white;
-        padding: 15px;
-        border-bottom: 1px solid #e1e5eb;
-        z-index: 999;
-        transform: translateY(-100%);
-        transition: transform 0.3s ease;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-    
-    .mobile-search-bar.active {
-        transform: translateY(0);
-    }
-    
-    .mobile-search-box {
-        position: relative;
-        margin-bottom: 10px;
-    }
-    
-    .mobile-search-box input {
-        width: 100%;
-        padding: 12px 15px 12px 40px;
-        border: 1px solid #d1d9e6;
-        border-radius: 8px;
-        font-size: 16px; /* 防止iOS缩放 */
-        background-color: #f9fbfd;
-    }
-    
-    .mobile-search-box i {
-        position: absolute;
-        left: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #888;
-    }
-    
-    .mobile-search-filters {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-    
-    .mobile-search-filters select {
-        flex: 1;
-        min-width: 120px;
-        padding: 8px 12px;
-        border: 1px solid #d1d9e6;
-        border-radius: 4px;
-        font-size: 14px;
-        background-color: white;
-    }
-    
-    /* 内容区域优化 */
     .content-area {
         width: 100%;
         padding: 15px;
-        padding-bottom: 70px; /* 为底部导航栏留出空间 */
-        overflow-y: auto;
-        background-color: #fff;
-        -webkit-overflow-scrolling: touch;
+        padding-top: 80px; /* 为顶部导航留出空间 */
+        overflow-x: hidden;
     }
     
     .content-header {
-        margin-bottom: 20px;
+        margin-bottom: 15px;
         padding-bottom: 10px;
     }
     
     .content-header h2 {
-        font-size: 1.4rem;
+        font-size: 1.3rem;
+        margin-bottom: 3px;
     }
     
     .content-header p {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
+}
+
+/* ==================== 移动端顶部导航 ==================== */
+.mobile-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+    color: white;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding-top: env(safe-area-inset-top); /* iOS安全区域 */
+}
+
+.mobile-header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    height: 60px;
+}
+
+.mobile-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.mobile-menu-toggle {
+    background: none;
+    border: none;
+    width: 28px;
+    height: 28px;
+    position: relative;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.mobile-menu-toggle span {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background-color: white;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+
+.mobile-menu-toggle.active span:nth-child(1) {
+    transform: rotate(45deg) translate(6px, 6px);
+}
+
+.mobile-menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.mobile-menu-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(6px, -6px);
+}
+
+.mobile-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mobile-logo-icon {
+    font-size: 20px;
+}
+
+.mobile-logo-text {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.mobile-header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.mobile-search-toggle,
+.mobile-view-toggle {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.mobile-search-toggle:hover,
+.mobile-view-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+    /* 移动端搜索栏 */
+.mobile-search-bar {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    background-color: white;
+    padding: 15px;
+    border-bottom: 1px solid #e1e5eb;
+    z-index: 999;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
     
-    /* 卡片布局优化 */
+.mobile-search-bar.active {
+    transform: translateY(0);
+}
+    
+.mobile-search-box {
+    position: relative;
+    margin-bottom: 10px;
+}
+    
+.mobile-search-box input {
+    width: 100%;
+    padding: 12px 15px 12px 40px;
+    border: 1px solid #d1d9e6;
+    border-radius: 8px;
+    font-size: 16px; /* 防止iOS缩放 */
+    background-color: #f9fbfd;
+}
+    
+.mobile-search-box i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+}
+    
+.mobile-search-filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+    
+.mobile-search-filters select {
+    flex: 1;
+    min-width: 120px;
+    padding: 8px 12px;
+    border: 1px solid #d1d9e6;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+}
+    
+/* 移动端视图切换器 */
+.mobile-view-switcher {
+    padding: 0 15px 12px;
+    display: none;
+}
+
+.mobile-view-switcher.active {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+.mobile-view-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.mobile-view-option {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    padding: 10px 5px;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mobile-view-option i {
+    font-size: 16px;
+}
+
+.mobile-view-option.active {
+    background-color: rgba(255, 255, 255, 0.25);
+    font-weight: 600;
+}
+
+.mobile-view-option:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ==================== 移动端底部导航 ==================== */
+.mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border-top: 1px solid #e1e5eb;
+    z-index: 999;
+    padding-bottom: env(safe-area-inset-bottom); /* iOS安全区域 */
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.mobile-bottom-nav-inner {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 60px;
+    padding: 0 10px;
+}
+
+.mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #666;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    flex: 1;
+    max-width: 80px;
+}
+
+.mobile-nav-item i {
+    font-size: 18px;
+    margin-bottom: 3px;
+}
+
+.mobile-nav-item span {
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.mobile-nav-item.active {
+    color: var(--primary-color);
+    background-color: rgba(26, 35, 126, 0.05);
+}
+
+.mobile-nav-item:hover {
+    background-color: rgba(26, 35, 126, 0.05);
+}
+
+/* ==================== 移动端侧边栏菜单 ==================== */
+.mobile-sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1100;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.mobile-sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.mobile-sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100%;
+    background-color: white;
+    z-index: 1101;
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+    transition: left 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.mobile-sidebar.active {
+    left: 0;
+}
+
+.mobile-sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+    color: white;
+}
+
+.mobile-sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.mobile-user-avatar {
+    font-size: 40px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.mobile-user-info {
+    flex: 1;
+}
+
+.mobile-user-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.mobile-user-status {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.mobile-sidebar-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.mobile-sidebar-close:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-sidebar-content {
+    flex: 1;
+    padding: 20px 0;
+    overflow-y: auto;
+}
+
+.mobile-nav-section {
+    margin-bottom: 25px;
+    padding: 0 20px;
+}
+
+.mobile-nav-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--primary-color);
+    font-size: 14px;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.mobile-nav-section-title i {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.mobile-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.mobile-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    color: #555;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.mobile-nav-link i {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+    color: #777;
+}
+
+.mobile-nav-link:hover {
+    background-color: #f0f4f9;
+    color: var(--primary-color);
+}
+
+.mobile-nav-link.active {
+    background-color: #e8edff;
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.mobile-nav-link.active i {
+    color: var(--primary-color);
+}
+
+.mobile-sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid #f0f0f0;
+    margin-top: auto;
+}
+
+.mobile-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    text-align: center;
+}
+
+.mobile-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.mobile-stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 3px;
+}
+
+.mobile-stat-label {
+    font-size: 11px;
+    color: #666;
+}
+
+/* ==================== 移动端卡片样式优化 ==================== */
+@media (max-width: 768px) {
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
-        margin-bottom: 20px;
     }
     
     .stat-card {
         padding: 15px;
+        border-top-width: 3px;
+    }
+    
+    .stat-card h3 {
+        font-size: 14px;
     }
     
     .stat-value {
@@ -253,7 +520,7 @@
     .records-list,
     .models-list {
         grid-template-columns: 1fr;
-        gap: 15px;
+        gap: 12px;
     }
     
     .record-card,
@@ -261,78 +528,27 @@
         padding: 15px;
     }
     
+    .record-id,
+    .model-id {
+        font-size: 14px;
+    }
+    
+    .record-title,
+    .model-name {
+        font-size: 16px;
+    }
+    
+    .record-desc,
+    .model-desc {
+        font-size: 13px;
+    }
+    
     .card-actions {
         opacity: 1; /* 移动端始终显示操作按钮 */
     }
     
-    /* 按钮优化 */
-    .btn {
-        padding: 10px 16px;
-        font-size: 0.95rem;
-        min-height: 44px; /* 触摸友好 */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .btn-group {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .btn-group .btn {
-        width: 100%;
-    }
-    
-    .action-buttons {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .action-buttons .btn {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    /* 输入框优化 */
-    textarea, input[type="text"] {
-        font-size: 16px; /* 防止iOS自动缩放 */
-        min-height: 120px;
-        padding: 12px;
-        border-radius: 8px;
-    }
-    
-    textarea {
-        min-height: 200px;
-    }
-    
-    /* 模态框优化 */
-    .modal-overlay {
-        padding: 15px;
-        align-items: flex-start;
-        padding-top: 60px;
-    }
-    
-    .modal {
-        max-width: 100%;
-        max-height: 80vh;
-        padding: 20px;
-        border-radius: 12px;
-    }
-    
-    /* 标签优化 */
-    .tag {
-        padding: 6px 12px;
-        font-size: 0.85rem;
-        margin-bottom: 6px;
-        border-radius: 16px;
-    }
-    
-    /* 详情页优化 */
     .detail-view {
         padding: 15px;
-        border-radius: 12px;
-        margin-bottom: 20px;
     }
     
     .detail-header {
@@ -342,143 +558,195 @@
     }
     
     .detail-title {
-        font-size: 1.3rem;
+        font-size: 18px;
     }
     
-    /* 移动端快速操作按钮 */
-    .mobile-fab {
-        position: fixed;
-        bottom: 80px;
-        right: 20px;
-        width: 56px;
-        height: 56px;
-        background-color: var(--accent-color);
-        color: white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        box-shadow: 0 4px 12px rgba(92, 107, 192, 0.3);
-        cursor: pointer;
-        z-index: 999;
-        transition: all 0.2s;
-        border: none;
+    .detail-id {
+        font-size: 14px;
+        align-self: flex-start;
     }
     
-    .mobile-fab:hover {
-        transform: scale(1.05);
-        box-shadow: 0 6px 16px rgba(92, 107, 192, 0.4);
-    }
-    
-    /* 移动端返回按钮 */
-    .mobile-back-btn {
-        display: flex;
-        align-items: center;
+    .action-buttons {
+        flex-direction: column;
         gap: 8px;
-        padding: 8px 16px;
-        background-color: rgba(255, 255, 255, 0.1);
-        color: white;
-        border: none;
-        border-radius: 20px;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: all 0.2s;
     }
     
-    .mobile-back-btn:hover {
-        background-color: rgba(255, 255, 255, 0.2);
+    .action-buttons .btn {
+        width: 100%;
+        justify-content: center;
     }
     
-    /* 时间线优化 */
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    textarea, input[type="text"] {
+        font-size: 16px; /* 防止iOS自动缩放 */
+        min-height: 200px;
+    }
+    
+    .modal-overlay {
+        padding: 10px;
+    }
+    
+    .modal {
+        padding: 20px;
+        max-width: 95%;
+        max-height: 85vh;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+    }
+    
+    .modal-actions .btn {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    
+    /* 时间线调整 */
     .timeline-container {
         padding-left: 20px;
+        margin: 20px 0;
     }
     
     .timeline-dot {
-        left: -30px;
+        left: -28px;
+        width: 10px;
+        height: 10px;
     }
     
-    /* 网络节点优化 */
-    .network-node {
-        padding: 10px 14px;
-        font-size: 0.85rem;
+    .timeline-content {
+        padding: 12px;
     }
     
-    /* 移动端工具栏 */
-    .mobile-toolbar {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 15px;
-        flex-wrap: wrap;
+    .timeline-version {
+        font-size: 14px;
     }
     
-    .mobile-toolbar-btn {
-        padding: 8px 12px;
-        background-color: white;
-        border: 1px solid #e1e5eb;
-        border-radius: 6px;
-        font-size: 0.9rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
+    .timeline-date {
+        font-size: 12px;
+    }
+    
+    /* 标签样式调整 */
+    .tag {
+        font-size: 12px;
+        padding: 3px 8px;
+        margin-bottom: 5px;
+    }
+    
+    .tag-cloud {
         gap: 6px;
-        transition: all 0.2s;
     }
     
-    .mobile-toolbar-btn.active {
-        background-color: var(--primary-color);
-        color: white;
-        border-color: var(--primary-color);
+    /* 索引列表调整 */
+    .index-item {
+        padding: 10px;
+    }
+    
+    .index-item-id {
+        min-width: 50px;
+        font-size: 12px;
+    }
+    
+    .index-item-title {
+        font-size: 13px;
+    }
+    
+    /* 空状态调整 */
+    .empty-state {
+        padding: 30px 15px;
+    }
+    
+    .empty-state i {
+        font-size: 36px;
+    }
+    
+    /* 加载动画调整 */
+    .loading {
+        width: 24px;
+        height: 24px;
     }
 }
 
-/* 小屏幕手机优化 */
+/* 小屏幕手机进一步优化 */
 @media (max-width: 480px) {
     .stats-grid {
         grid-template-columns: 1fr;
     }
     
+    .content-area {
+        padding: 12px;
+        padding-top: 60px;
+    }
+    
+    .mobile-header-inner {
+        padding: 10px 12px;
+        height: 50px;
+    }
+    
+    .mobile-bottom-nav {
+        height: 55px;
+    }
+    
+    .mobile-bottom-nav-inner {
+        height: 55px;
+    }
+    
     .mobile-nav-item {
-        font-size: 0.7rem;
-        padding: 6px;
+        padding: 6px 8px;
+        max-width: 70px;
     }
     
     .mobile-nav-item i {
-        font-size: 1rem;
+        font-size: 16px;
     }
     
-    .content-area {
-        padding: 12px;
-        padding-bottom: 70px;
+    .mobile-nav-item span {
+        font-size: 9px;
     }
     
-    .btn {
-        padding: 12px;
-        font-size: 0.9rem;
+    .mobile-view-options {
+        grid-template-columns: repeat(2, 1fr);
     }
     
-    .modal {
-        padding: 15px;
+    .mobile-view-option {
+        padding: 12px 8px;
+        font-size: 11px;
     }
     
-    .mobile-fab {
-        bottom: 70px;
-        right: 15px;
-        width: 52px;
-        height: 52px;
-        font-size: 1.3rem;
+    .mobile-view-option i {
+        font-size: 18px;
+    }
+    
+    .mobile-sidebar {
+        width: 85%;
+        max-width: 280px;
+        left: -100%;
+    }
+    
+    .mobile-sidebar.active {
+        left: 0;
     }
 }
 
 /* 平板设备优化 */
 @media (min-width: 769px) and (max-width: 1024px) {
-    .sidebar {
-        width: 240px;
+    .mobile-header {
+        display: block;
     }
     
-    .right-panel {
-        width: 280px;
+    .desktop-only {
+        display: none;
+    }
+    
+    .content-area {
+        padding-top: 70px;
     }
     
     .stats-grid {
@@ -489,19 +757,61 @@
     .models-list {
         grid-template-columns: repeat(2, 1fr);
     }
+    
+    .mobile-bottom-nav {
+        display: none; /* 平板隐藏底部导航 */
+    }
+    
+    body {
+        padding-bottom: 0;
+    }
 }
 
-/* 移动端暗色模式支持 */
-@media (prefers-color-scheme: dark) and (max-width: 768px) {
-    body {
-        background-color: #121212;
-        color: #e0e0e0;
+/* 横屏模式优化 */
+@media (max-height: 500px) and (orientation: landscape) {
+    .mobile-header {
+        height: 50px;
+    }
+    
+    .mobile-header-inner {
+        height: 50px;
+        padding: 8px 15px;
+    }
+    
+    .mobile-search-bar,
+    .mobile-view-switcher {
+        padding-bottom: 8px;
     }
     
     .content-area {
-        background-color: #1e1e1e;
+        padding-top: 50px;
+        padding-bottom: 50px;
     }
     
+    .mobile-bottom-nav {
+        height: 45px;
+    }
+    
+    .mobile-bottom-nav-inner {
+        height: 45px;
+    }
+    
+    .mobile-nav-item i {
+        font-size: 16px;
+        margin-bottom: 0;
+    }
+    
+    .mobile-nav-item span {
+        display: none; /* 横屏隐藏文字 */
+    }
+    
+    .mobile-sidebar {
+        width: 60%;
+    }
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
     .mobile-bottom-nav {
         background-color: #1e1e1e;
         border-top-color: #333;
@@ -512,75 +822,112 @@
     }
     
     .mobile-nav-item.active {
-        color: #bb86fc;
-        background-color: rgba(187, 134, 252, 0.1);
+        color: #7c9eff;
+        background-color: rgba(124, 158, 255, 0.1);
     }
     
     .mobile-sidebar {
         background-color: #1e1e1e;
-        color: #e0e0e0;
+        color: #fff;
     }
     
-    .record-card,
-    .model-card,
-    .stat-card,
-    .detail-view,
-    .modal {
-        background-color: #2d2d2d;
-        color: #e0e0e0;
-        border-color: #333;
-    }
-    
-    .btn-secondary {
-        background-color: #333;
-        color: #e0e0e0;
-        border-color: #444;
-    }
-    
-    .tag {
-        background-color: rgba(187, 134, 252, 0.1);
-        color: #bb86fc;
-    }
-    
-    .mobile-search-bar {
-        background-color: #1e1e1e;
+    .mobile-nav-section-title {
+        color: #7c9eff;
         border-bottom-color: #333;
     }
     
-    .mobile-search-box input {
-        background-color: #2d2d2d;
-        border-color: #444;
-        color: #e0e0e0;
+    .mobile-nav-link {
+        color: #ccc;
     }
     
-    .mobile-toolbar-btn {
-        background-color: #2d2d2d;
-        border-color: #444;
-        color: #e0e0e0;
+    .mobile-nav-link:hover {
+        background-color: #2a2a2a;
+        color: #7c9eff;
+    }
+    
+    .mobile-nav-link.active {
+        background-color: rgba(124, 158, 255, 0.15);
+        color: #7c9eff;
+    }
+    
+    .mobile-nav-link i {
+        color: #999;
+    }
+    
+    .mobile-sidebar-footer {
+        border-top-color: #333;
+    }
+    
+    .mobile-stat-value {
+        color: #7c9eff;
+    }
+    
+    .mobile-stat-label {
+        color: #aaa;
     }
 }
 
-/* 移动端动画优化 */
-@keyframes slideInUp {
-    from {
-        transform: translateY(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+/* 滚动条优化 */
+.mobile-sidebar-content::-webkit-scrollbar {
+    width: 4px;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+.mobile-sidebar-content::-webkit-scrollbar-track {
+    background: transparent;
 }
 
-.mobile-menu-active {
-    overflow: hidden;
+.mobile-sidebar-content::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+}
+
+.mobile-sidebar-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* 触摸反馈优化 */
+.btn, 
+.mobile-nav-item,
+.mobile-nav-link,
+.mobile-view-option,
+.record-card,
+.model-card {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    touch-action: manipulation;
+}
+
+/* 防止长按菜单 */
+button, a {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* 防止文本选择 */
+input, textarea {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+/* 平滑滚动 */
+html {
+    scroll-behavior: smooth;
+}
+
+/* 优化动画性能 */
+.mobile-sidebar,
+.mobile-sidebar-overlay,
+.mobile-search-bar,
+.mobile-view-switcher {
+    will-change: transform, opacity;
+}
+
+/* 隐藏滚动条但保持滚动功能 */
+.mobile-sidebar-content {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+}
+
+.mobile-sidebar-content::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
 }
