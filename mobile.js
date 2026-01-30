@@ -52,6 +52,7 @@ const MobileManager = {
             });
         }
     },
+    
     // 设置移动端搜索功能
     setupMobileSearch: function() {
         const searchToggle = document.getElementById('mobile-search-toggle');
