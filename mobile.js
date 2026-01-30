@@ -365,3 +365,167 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 100);
 });
+// ==================== GitHub Pages 数据同步模块 ====================
+const GitHubDataSync = {
+    // 数据文件的URL
+    dataUrl: 'https://[你的用户名].github.io/[仓库名]/thought-data.json',
+    
+    // 初始化数据同步
+    init: function() {
+        if (!this.isMobile()) return;
+        
+        console.log('正在从GitHub Pages加载数据...');
+        
+        // 从GitHub加载数据
+        this.loadDataFromGitHub();
+        
+        // 定时检查数据更新（可选）
+        this.setupAutoRefresh();
+    },
+    
+    // 判断是否为移动端
+    isMobile: function() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    },
+    
+    // 从GitHub加载数据
+    loadDataFromGitHub: function() {
+        fetch(this.dataUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('数据加载失败');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('从GitHub加载数据成功');
+                
+                // 将数据保存到localStorage供应用使用
+                localStorage.setItem('structuredThoughtAssistant', JSON.stringify(data));
+                
+                // 显示数据更新时间
+                this.showUpdateTime(data.lastUpdated);
+                
+                // 刷新UI（如果UI已初始化）
+                if (typeof UIManager !== 'undefined' && UIManager.loadView) {
+                    UIManager.loadView(UIManager.currentView || 'thought-map');
+                }
+                
+                // 如果是移动端导航管理器，也刷新一下
+                if (typeof MobileTopNavManager !== 'undefined' && MobileTopNavManager.refreshThoughtList) {
+                    MobileTopNavManager.refreshThoughtList();
+                    MobileTopNavManager.refreshModelList();
+                    MobileTopNavManager.updateDataStats();
+                }
+            })
+            .catch(error => {
+                console.error('从GitHub加载数据失败:', error);
+                
+                // 如果加载失败，尝试使用本地缓存的数据
+                this.showDataLoadError();
+            });
+    },
+    
+    // 显示数据更新时间
+    showUpdateTime: function(timestamp) {
+        const timeElement = document.getElementById('data-update-time');
+        if (timeElement) {
+            const date = new Date(timestamp);
+            timeElement.textContent = `数据更新时间: ${date.toLocaleString()}`;
+            timeElement.style.display = 'block';
+        }
+    },
+    
+    // 显示数据加载错误
+    showDataLoadError: function() {
+        // 只在第一次加载失败时显示提示
+        if (!sessionStorage.getItem('dataLoadErrorShown')) {
+            const errorHtml = `
+                <div class="data-load-error">
+                    <p><i class="fas fa-exclamation-triangle"></i> 无法从服务器加载数据</p>
+                    <p>正在使用本地缓存数据，可能不是最新版本</p>
+                    <button onclick="GitHubDataSync.loadDataFromGitHub()" class="retry-btn">
+                        重试加载
+                    </button>
+                </div>
+            `;
+            
+            const container = document.getElementById('content-area') || document.body;
+            container.insertAdjacentHTML('afterbegin', errorHtml);
+            
+            sessionStorage.setItem('dataLoadErrorShown', 'true');
+        }
+    },
+    
+    // 设置自动刷新（可选，每5分钟检查一次）
+    setupAutoRefresh: function() {
+        // 每5分钟检查一次数据更新
+        setInterval(() => {
+            this.checkForUpdates();
+        }, 5 * 60 * 1000);
+    },
+    
+    // 检查数据更新
+    checkForUpdates: function() {
+        // 获取当前数据的更新时间
+        const currentData = localStorage.getItem('structuredThoughtAssistant');
+        if (!currentData) return;
+        
+        fetch(this.dataUrl + '?' + new Date().getTime()) // 添加时间戳防止缓存
+            .then(response => response.json())
+            .then(remoteData => {
+                const currentParsed = JSON.parse(currentData);
+                
+                // 如果远程数据更新，则重新加载
+                if (remoteData.lastUpdated > currentParsed.lastUpdated) {
+                    console.log('检测到数据更新，正在重新加载...');
+                    this.loadDataFromGitHub();
+                }
+            })
+            .catch(() => {
+                // 忽略错误，保持当前数据
+            });
+    },
+    
+    // 电脑端导出数据到GitHub文件（这个函数只在电脑端使用）
+    exportDataForGitHub: function() {
+        // 获取当前数据
+        const data = localStorage.getItem('structuredThoughtAssistant');
+        if (!data) {
+            alert('没有数据可导出');
+            return;
+        }
+        
+        try {
+            const parsedData = JSON.parse(data);
+            
+            // 更新最后修改时间
+            parsedData.lastUpdated = new Date().toISOString();
+            
+            // 创建Blob对象
+            const blob = new Blob([JSON.stringify(parsedData, null, 2)], { 
+                type: 'application/json' 
+            });
+            
+            // 创建下载链接
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'thought-data.json';
+            
+            // 添加到页面并触发下载
+            document.body.appendChild(a);
+            a.click();
+            
+            // 清理
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+            
+            alert('数据已导出为 thought-data.json 文件\n请将此文件上传到GitHub仓库根目录');
+        } catch (error) {
+            alert('导出失败: ' + error.message);
+        }
+    }
+};
