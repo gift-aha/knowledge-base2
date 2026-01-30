@@ -70,8 +70,10 @@
     <!-- 数据更新时间显示（移动端可见） -->
     <div id="data-update-time" class="data-update-time"></div>
     
-    <!-- GitHub导出按钮（电脑端可见） -->
-    <button id="github-export-btn" class="github-export-btn">
+    <!-- 在电脑端添加导出按钮（可选位置） -->
+    <button id="github-export-btn" class="github-export-btn" 
+            onclick="GitHubDataSync.exportDataForGitHub()"
+            style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
         <i class="fas fa-cloud-upload-alt"></i> 导出到GitHub
     </button>
         
