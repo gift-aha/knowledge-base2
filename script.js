@@ -4158,3 +4158,313 @@ const MobilePerformance = {
         // 例如：加载更多内容、更新位置等
     }
 };
+// ==================== 移动端优化总初始化 ====================
+const MobileOptimizer = {
+    // 初始化所有移动端优化
+    init: function() {
+        if (!MobileDataManager.isMobile()) return;
+        
+        console.log('初始化移动端优化...');
+        
+        // 1. 初始化数据管理
+        MobileDataManager.init();
+        
+        // 2. 初始化导航管理器
+        MobileNavManager.init();
+        
+        // 3. 初始化数据同步
+        MobileDataSync.init();
+        
+        // 4. 初始化性能优化
+        MobilePerformance.init();
+        
+        // 5. 添加移动端特定样式
+        this.addMobileSpecificStyles();
+        
+        // 6. 优化现有UI组件
+        this.optimizeExistingUI();
+        
+        // 7. 添加移动端事件监听
+        this.setupMobileEventListeners();
+        
+        console.log('移动端优化完成');
+    },
+    
+    addMobileSpecificStyles: function() {
+        // 确保移动端CSS已加载
+        if (!document.getElementById('mobile-styles')) {
+            const style = document.createElement('style');
+            style.id = 'mobile-styles';
+            style.textContent = MobileCSS; // 这里应该包含所有移动端CSS
+            document.head.appendChild(style);
+        }
+    },
+    
+    optimizeExistingUI: function() {
+        // 优化现有UI组件以适应移动端
+        this.optimizeThoughtCards();
+        this.optimizeModelGrid();
+        this.optimizeForms();
+    },
+    
+    optimizeThoughtCards: function() {
+        // 思维卡片移动端优化
+        const cards = document.querySelectorAll('.thought-card');
+        cards.forEach(card => {
+            card.style.padding = '12px';
+            card.style.margin = '8px 0';
+            card.style.fontSize = '14px';
+            
+            // 添加触摸反馈
+            card.style.transition = 'background-color 0.2s';
+            card.addEventListener('touchstart', () => {
+                card.style.backgroundColor = '#f5f5f5';
+            });
+            card.addEventListener('touchend', () => {
+                card.style.backgroundColor = '';
+            });
+        });
+    },
+    
+    optimizeModelGrid: function() {
+        // 模型网格移动端优化
+        const grid = document.querySelector('.model-grid');
+        if (grid) {
+            grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(150px, 1fr))';
+            grid.style.gap = '10px';
+        }
+    },
+    
+    optimizeForms: function() {
+        // 表单元素移动端优化
+        const inputs = document.querySelectorAll('input, textarea, select');
+        inputs.forEach(input => {
+            // 确保字体大小合适
+            if (input.type !== 'checkbox' && input.type !== 'radio') {
+                input.style.fontSize = '16px'; // 防止iOS缩放
+                input.style.minHeight = '44px'; // 最小触摸目标尺寸
+            }
+            
+            // 添加适当的边距
+            input.style.margin = '8px 0';
+        });
+    },
+    
+    setupMobileEventListeners: function() {
+        // 防止双击缩放
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (event) => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+        
+        // 处理虚拟键盘弹出
+        window.addEventListener('resize', () => {
+            setTimeout(() => {
+                // 滚动到活动输入框
+                const activeElement = document.activeElement;
+                if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+                    activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
+        });
+        
+        // 页面可见性变化时保存数据
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // 页面隐藏时自动保存
+                this.autoSave();
+            }
+        });
+    },
+    
+    autoSave: function() {
+        console.log('移动端自动保存...');
+        // 这里可以实现自动保存逻辑
+        if (typeof DataStore !== 'undefined' && typeof DataStore.saveData === 'function') {
+            DataStore.saveData();
+        }
+    }
+};
+
+// 在页面加载完成后初始化
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        MobileOptimizer.init();
+    }, 100);
+});
+
+// 添加移动端CSS变量
+const MobileCSS = `
+    :root {
+        --mobile-safe-area-top: env(safe-area-inset-top);
+        --mobile-safe-area-bottom: env(safe-area-inset-bottom);
+        --mobile-safe-area-left: env(safe-area-inset-left);
+        --mobile-safe-area-right: env(safe-area-inset-right);
+    }
+    
+    /* 同步通知样式 */
+    .sync-notification {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        z-index: 2000;
+        overflow: hidden;
+    }
+    
+    .sync-notice {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+    }
+    
+    .sync-notice i {
+        font-size: 24px;
+        margin-right: 15px;
+    }
+    
+    .sync-text {
+        flex: 1;
+    }
+    
+    .sync-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 18px;
+    }
+    
+    .sync-actions {
+        display: flex;
+        padding: 0 15px 15px;
+        gap: 10px;
+    }
+    
+    .sync-btn {
+        flex: 1;
+        padding: 10px;
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 6px;
+        color: white;
+        backdrop-filter: blur(10px);
+    }
+    
+    .sync-btn.secondary {
+        background: rgba(255,255,255,0.1);
+    }
+    
+    /* 同步帮助弹窗 */
+    .sync-help-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2001;
+        padding: 20px;
+    }
+    
+    .help-content {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        max-width: 500px;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    
+    .help-content h3 {
+        display: flex;
+        align-items: center;
+        color: #007bff;
+        margin-bottom: 20px;
+    }
+    
+    .help-content h3 i {
+        margin-right: 10px;
+    }
+    
+    .help-tips {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+    }
+    
+    .close-help {
+        width: 100%;
+        margin-top: 20px;
+    }
+    
+    /* 移动端特定按钮样式 */
+    .mobile-btn {
+        padding: 14px 20px;
+        border-radius: 8px;
+        border: none;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.2s;
+        font-size: 15px;
+    }
+    
+    .mobile-btn:active {
+        transform: scale(0.98);
+    }
+    
+    .mobile-btn.export {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+    }
+    
+    .mobile-btn.import {
+        background: linear-gradient(135deg, #17a2b8 0%, #6fcee6 100%);
+        color: white;
+    }
+    
+    /* 响应式表格 */
+    .mobile-table {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* 加载状态优化 */
+    .mobile-loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+    }
+    
+    .mobile-loading .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #007bff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+`;
