@@ -67,6 +67,7 @@
             </div>
         </div>
     </div>
+  
         
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -109,6 +110,12 @@
             <span>思考记录: <strong id="total-thoughts">0</strong></span>
             <span style="margin: 0 5px;">|</span>
             <span>标签数: <strong id="total-tags">0</strong></span>
+        </div>
+        <!-- 在顶部状态栏添加 -->
+        <div class="sync-buttons">
+            <button class="btn btn-sm" onclick="exportForSync()" title="生成同步链接" style="background: var(--accent-color); color: white; margin-right: 5px;">
+                <i class="fas fa-share-alt"></i> 同步
+            </button>
         </div>
         <div class="current-view" id="current-view">核心资产总览</div>
     </div>
