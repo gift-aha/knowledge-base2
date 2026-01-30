@@ -52,101 +52,225 @@ const MobileManager = {
             });
         }
     },
-    
-    // 设置移动端搜索功能
     setupMobileSearch: function() {
-        const searchToggle = document.getElementById('mobile-search-toggle');
+        // 移动端搜索按钮
+        const searchBtn = document.getElementById('mobile-search-btn');
         const searchBar = document.getElementById('mobile-search-bar');
         const searchInput = document.getElementById('mobile-search-input');
-        const searchClear = document.getElementById('mobile-search-clear');
-        const viewToggle = document.getElementById('mobile-view-toggle');
-        const viewSwitcher = document.getElementById('mobile-view-switcher');
+        const categoryFilter = document.getElementById('mobile-category-filter');
+        const themeFilter = document.getElementById('mobile-theme-filter');
         
-        if (searchToggle && searchBar) {
-            searchToggle.addEventListener('click', () => {
-                // 关闭视图切换器
-                viewSwitcher.classList.remove('active');
-                viewToggle.classList.remove('active');
-                
-                // 切换搜索栏
+        if (searchBtn && searchBar) {
+            // 切换搜索栏显示
+            searchBtn.addEventListener('click', () => {
                 searchBar.classList.toggle('active');
-                searchToggle.classList.toggle('active');
-                
-                // 聚焦搜索框
-                if (searchBar.classList.contains('active')) {
-                    setTimeout(() => {
-                        searchInput.focus();
+                if (searchBar.classList.contains('active') && searchInput) {
+                    setTimeout(() => searchInput.focus(), 300);
+                }
+            });
+            
+            // 搜索输入事件
+            if (searchInput) {
+                // 添加防抖处理
+                let searchTimeout;
+                searchInput.addEventListener('input', () => {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        this.performMobileSearch();
                     }, 300);
-                }
-            });
-        }
-        
-        if (searchClear && searchInput) {
-            searchClear.addEventListener('click', () => {
-                searchInput.value = '';
-                searchInput.focus();
-            });
+                });
+                
+                // 回车键搜索
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.performMobileSearch();
+                        searchBar.classList.remove('active');
+                    }
+                });
+            }
             
-            // 实时搜索
-            searchInput.addEventListener('input', () => {
-                if (searchInput.value.trim()) {
-                    // 执行搜索
-                    UIManager.performSearch(searchInput.value);
-                } else {
-                    // 清除搜索
-                    UIManager.loadView(UIManager.currentView);
-                }
-            });
+            // 过滤器变化事件
+            if (categoryFilter) {
+                categoryFilter.addEventListener('change', () => {
+                    this.performMobileSearch();
+                });
+            }
             
-            // 搜索框回车键
-            searchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    UIManager.performSearch(searchInput.value);
-                    // 关闭搜索栏
+            if (themeFilter) {
+                themeFilter.addEventListener('change', () => {
+                    this.performMobileSearch();
+                });
+            }
+            
+            // 点击其他地方关闭搜索栏
+            document.addEventListener('click', (e) => {
+                if (e.target !== searchBtn && !searchBtn.contains(e.target) &&
+                    e.target !== searchBar && !searchBar.contains(e.target) &&
+                    e.target !== searchInput && !searchInput.contains(e.target)) {
                     searchBar.classList.remove('active');
-                    searchToggle.classList.remove('active');
                 }
             });
         }
     },
     
-    // 设置移动端视图切换器
-    setupMobileViewSwitcher: function() {
-        const viewToggle = document.getElementById('mobile-view-toggle');
-        const viewSwitcher = document.getElementById('mobile-view-switcher');
-        const viewOptions = document.querySelectorAll('.mobile-view-option');
-        const searchToggle = document.getElementById('mobile-search-toggle');
-        const searchBar = document.getElementById('mobile-search-bar');
+    performMobileSearch: function() {
+        const searchInput = document.getElementById('mobile-search-input');
+        const categoryFilter = document.getElementById('mobile-category-filter');
+        const themeFilter = document.getElementById('mobile-theme-filter');
         
-        if (viewToggle && viewSwitcher) {
-            viewToggle.addEventListener('click', () => {
-                // 关闭搜索栏
-                searchBar.classList.remove('active');
-                searchToggle.classList.remove('active');
-                
-                // 切换视图切换器
-                viewSwitcher.classList.toggle('active');
-                viewToggle.classList.toggle('active');
-            });
+        if (!searchInput) return;
+        
+        const query = searchInput.value.trim();
+        const category = categoryFilter ? categoryFilter.value : 'all';
+        const theme = themeFilter ? themeFilter.value : 'all';
+        
+        if (query) {
+            UIManager.currentView = 'search';
+            this.renderMobileSearchResults(query, category, theme);
+        } else {
+            // 如果搜索框为空，返回当前视图
+            UIManager.loadView(UIManager.currentView);
+        }
+    },
+    
+    renderMobileSearchResults: function(query, category, theme) {
+        const searchTerm = query.toLowerCase();
+        
+        // 搜索思考记录
+        const filteredThoughts = DataStore.thoughts.filter(thought => {
+            if (category === 'model') return false;
             
-            // 点击视图选项
-            viewOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    const view = option.getAttribute('data-view');
-                    
-                    // 更新活动状态
-                    viewOptions.forEach(opt => opt.classList.remove('active'));
-                    option.classList.add('active');
-                    
-                    // 加载视图
-                    UIManager.loadView(view);
-                    
-                    // 关闭切换器
-                    viewSwitcher.classList.remove('active');
-                    viewToggle.classList.remove('active');
-                });
+            const matchesSearch = (
+                (thought.title && thought.title.toLowerCase().includes(searchTerm)) ||
+                (thought.id && thought.id.toLowerCase().includes(searchTerm)) ||
+                (thought.tags && thought.tags.some(tag => tag.toLowerCase().includes(searchTerm))) ||
+                (thought.sections && Object.values(thought.sections).some(section => 
+                    section.toLowerCase().includes(searchTerm)
+                ))
+            );
+            
+            const matchesTheme = theme === 'all' || 
+                (thought.tags && thought.tags.some(tag => UIManager.tagMatchesTheme(tag, theme)));
+            
+            return matchesSearch && matchesTheme;
+        });
+        
+        // 搜索思维模型
+        const filteredModels = DataStore.models.filter(model => {
+            if (category === 'thought') return false;
+            
+            const matchesSearch = (
+                (model.name && model.name.toLowerCase().includes(searchTerm)) ||
+                (model.id && model.id.toLowerCase().includes(searchTerm)) ||
+                (model.tags && model.tags.some(tag => tag.toLowerCase().includes(searchTerm))) ||
+                (model.description && model.description.toLowerCase().includes(searchTerm))
+            );
+            
+            const matchesTheme = theme === 'all' || 
+                (model.tags && model.tags.some(tag => UIManager.tagMatchesTheme(tag, theme)));
+            
+            return matchesSearch && matchesTheme;
+        });
+        
+        // 渲染搜索结果
+        let resultsHTML = '';
+        
+        if (filteredThoughts.length > 0) {
+            filteredThoughts.forEach(thought => {
+                const summary = thought.sections && thought.sections["核心结论"] ? 
+                    thought.sections["核心结论"].substring(0, 60) + '...' : '';
+                
+                resultsHTML += `
+                    <div class="record-card" onclick="showThoughtDetail('${thought.id}')">
+                        <div class="record-id">${thought.id}</div>
+                        <div class="record-title">${thought.title || '无标题'}</div>
+                        <div class="record-desc">${summary}</div>
+                    </div>
+                `;
             });
         }
+        
+        if (filteredModels.length > 0) {
+            filteredModels.forEach(model => {
+                resultsHTML += `
+                    <div class="model-card" onclick="showModelDetail('${model.id}')">
+                        <div class="model-id">${model.id}</div>
+                        <div class="model-name">${model.name}</div>
+                        <div class="model-desc">${model.description.substring(0, 80)}...</div>
+                    </div>
+                `;
+            });
+        }
+        
+        const html = `
+            <div class="content-header">
+                <h2>搜索结果</h2>
+                <p>搜索关键词: "${query}" | 找到 ${filteredThoughts.length + filteredModels.length} 个结果</p>
+                <button class="mobile-toolbar-btn" onclick="UIManager.loadView('${UIManager.currentView}')">
+                    <i class="fas fa-arrow-left"></i> 返回
+                </button>
+            </div>
+            
+            <div class="records-list">
+                ${resultsHTML || '<div class="empty-state"><i class="fas fa-search"></i><p>未找到相关结果</p></div>'}
+            </div>
+        `;
+        
+        document.getElementById('content-area').innerHTML = html;
+        
+        // 更新底部导航状态
+        this.updateBottomNav('search');
+    },
+    
+    setupMobileEvents: function() {
+        // 窗口大小变化事件
+        window.addEventListener('resize', () => {
+            const isNowMobile = window.innerWidth <= 768;
+            
+            if (isNowMobile !== this.isMobile) {
+                // 重新加载页面以适应新的屏幕尺寸
+                location.reload();
+            }
+        });
+        
+        // 移动端返回按钮
+        window.addEventListener('popstate', () => {
+            if (this.isMobile) {
+                // 处理移动端返回逻辑
+                if (this.currentQuickView) {
+                    this.hideQuickView();
+                } else {
+                    // 返回上一视图
+                    UIManager.loadView(UIManager.currentView);
+                }
+            }
+        });
+        
+        // 触摸滑动支持
+        let touchStartX = 0;
+        let touchStartY = 0;
+        
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        });
+        
+        document.addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            const diffX = touchEndX - touchStartX;
+            const diffY = touchEndY - touchStartY;
+            
+            // 水平滑动超过50px，垂直滑动小于30px（避免与滚动冲突）
+            if (Math.abs(diffX) > 50 && Math.abs(diffY) < 30) {
+                // 右滑返回
+                if (diffX > 0 && UIManager.currentView !== 'overview') {
+                    // 模拟返回按钮
+                    const backBtn = document.querySelector('.mobile-back-btn');
+                    if (backBtn) backBtn.click();
+                }
+            }
+        });
     },
     
     // 设置移动端底部导航
