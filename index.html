@@ -111,10 +111,13 @@
             <span style="margin: 0 5px;">|</span>
             <span>标签数: <strong id="total-tags">0</strong></span>
         </div>
-        <!-- 在顶部状态栏添加 -->
-        <div class="sync-buttons">
-            <button class="btn btn-sm" onclick="exportForSync()" title="生成同步链接" style="background: var(--accent-color); color: white; margin-right: 5px;">
-                <i class="fas fa-share-alt"></i> 同步
+        <!-- 添加同步按钮 -->
+        <div class="sync-controls">
+            <button class="sync-btn" id="sync-btn" title="同步数据到其他设备">
+                <i class="fas fa-sync-alt"></i> 同步
+            </button>
+            <button class="sync-btn" id="export-btn" title="导出数据">
+                <i class="fas fa-download"></i> 导出
             </button>
         </div>
         <div class="current-view" id="current-view">核心资产总览</div>
