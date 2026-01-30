@@ -1719,3 +1719,45 @@ input[type="text"] {
         grid-template-columns: repeat(2, 1fr);
     }
 }
+/* ==================== GitHub数据同步样式（电脑端） ==================== */
+
+/* GitHub导出按钮样式 */
+.github-export-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    transition: all 0.3s;
+}
+
+.github-export-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+}
+
+.github-export-btn:active {
+    transform: translateY(0);
+}
+
+/* 在电脑端隐藏移动端的数据更新时间 */
+.data-update-time {
+    display: none;
+}
+
+/* 电脑端的数据加载错误提示（如果需要） */
+.data-load-error {
+    max-width: 500px;
+    margin: 20px auto;
+}
