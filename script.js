@@ -4596,6 +4596,50 @@ const MobileNavManager = {
         document.body.insertAdjacentHTML('beforeend', navHTML);
         this.bindCornerNavEvents();
     },
+
+        // 方案3: 手势导航 (边缘滑动)
+    createGestureNavigation: function() {
+        const navHTML = `
+            <div class="mobile-gesture-nav">
+                <div class="gesture-edge left-edge"></div>
+                <div class="gesture-edge right-edge"></div>
+                <div class="gesture-menu" id="gesture-menu">
+                    <div class="gesture-header">
+                        <h4>快速导航</h4>
+                        <button class="close-gesture" id="close-gesture">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="gesture-items">
+                        <button class="gesture-item" data-view="thought-map">
+                            <i class="fas fa-project-diagram"></i>
+                            <span>思维导图</span>
+                        </button>
+                        <button class="gesture-item" data-view="data-management">
+                            <i class="fas fa-database"></i>
+                            <span>数据管理</span>
+                        </button>
+                        <button class="gesture-item" data-view="model-manager">
+                            <i class="fas fa-robot"></i>
+                            <span>模型管理</span>
+                        </button>
+                        <button class="gesture-item" data-view="settings">
+                            <i class="fas fa-cog"></i>
+                            <span>设置</span>
+                        </button>
+                    </div>
+                    <div class="gesture-footer">
+                        <button class="gesture-btn" id="nav-style-toggle">
+                            <i class="fas fa-palette"></i> 切换导航样式
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', navHTML);
+        this.bindGestureNavEvents();
+    },
     
         // 添加导航样式切换按钮
     addNavToggle: function() {
