@@ -10,7 +10,7 @@
 - ✅ 响应式设计
 
 ## 在线访问
-https://gift-aha.github.io/knowledge-base/
+https://gift-aha.github.io/knowledge-base2/
 
 ## 本地运行
 直接打开 index.html 文件即可。
