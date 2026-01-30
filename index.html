@@ -67,15 +67,6 @@
             </div>
         </div>
     </div>
-    <!-- 数据更新时间显示（移动端可见） -->
-    <div id="data-update-time" class="data-update-time"></div>
-    
-    <!-- 在电脑端添加导出按钮（可选位置） -->
-    <button id="github-export-btn" class="github-export-btn" 
-            onclick="GitHubDataSync.exportDataForGitHub()"
-            style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
-        <i class="fas fa-cloud-upload-alt"></i> 导出到GitHub
-    </button>
         
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -130,6 +121,16 @@
         </div>
         <div class="current-view" id="current-view">核心资产总览</div>
     </div>
+    
+        <!-- 数据更新时间显示（移动端可见） -->
+    <div id="data-update-time" class="data-update-time"></div>
+    
+    <!-- 在电脑端添加导出按钮（可选位置） -->
+    <button id="github-export-btn" class="github-export-btn" 
+            onclick="GitHubDataSync.exportDataForGitHub()"
+            style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+        <i class="fas fa-cloud-upload-alt"></i> 导出到GitHub
+    </button>
     
     <!-- 主内容区 -->
     <div class="main-container">
