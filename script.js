@@ -4003,3 +4003,158 @@ const MobileDataSync = {
         return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
     }
 };
+// ==================== 移动端性能优化 ====================
+const MobilePerformance = {
+    init: function() {
+        if (!MobileDataManager.isMobile()) return;
+        
+        // 优化滚动性能
+        this.optimizeScrollPerformance();
+        
+        // 减少重绘重排
+        this.reduceLayoutThrashing();
+        
+        // 优化图片加载
+        this.optimizeImageLoading();
+        
+        // 添加性能监控
+        this.setupPerformanceMonitor();
+    },
+    
+    optimizeScrollPerformance: function() {
+        // 启用硬件加速
+        const style = document.createElement('style');
+        style.textContent = `
+            .scroll-container, .thought-list, .model-grid {
+                -webkit-overflow-scrolling: touch;
+                transform: translateZ(0);
+                will-change: transform;
+            }
+            
+            /* 防止滚动卡顿 */
+            * {
+                -webkit-tap-highlight-color: transparent;
+                -webkit-touch-callout: none;
+            }
+        `;
+        document.head.appendChild(style);
+    },
+    
+    reduceLayoutThrashing: function() {
+        // 使用requestAnimationFrame优化DOM操作
+        const originLoadView = UIManager.loadView;
+        UIManager.loadView = function(view) {
+            requestAnimationFrame(() => {
+                originLoadView.call(this, view);
+            });
+        };
+        
+        // 防抖处理滚动事件
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                // 延迟执行的滚动处理
+                this.handleScrollEnd();
+            }, 100);
+        });
+    },
+    
+    optimizeImageLoading: function() {
+        // 懒加载图片
+        const lazyImages = document.querySelectorAll('img[data-src]');
+        
+        const imageObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
+                    imageObserver.unobserve(img);
+                }
+            });
+        });
+        
+        lazyImages.forEach(img => imageObserver.observe(img));
+    },
+    
+    setupPerformanceMonitor: function() {
+        // 监控内存使用
+        setInterval(() => {
+            this.checkMemoryUsage();
+        }, 30000);
+        
+        // 监控FPS
+        this.monitorFPS();
+    },
+    
+    checkMemoryUsage: function() {
+        // 检查localStorage使用情况
+        let totalSize = 0;
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            const value = localStorage.getItem(key);
+            totalSize += key.length + value.length;
+        }
+        
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (totalSize > maxSize * 0.8) {
+            this.showStorageWarning(totalSize);
+        }
+    },
+    
+    showStorageWarning: function(size) {
+        const mb = (size / 1024 / 1024).toFixed(2);
+        console.warn(`本地存储使用率较高: ${mb}MB`);
+        
+        // 只在用户操作时提示，避免打扰
+        if (Math.random() < 0.1) { // 10%几率提示
+            console.info('建议清理不需要的数据或导出备份');
+        }
+    },
+    
+    monitorFPS: function() {
+        let lastTime = performance.now();
+        let frameCount = 0;
+        let currentFPS = 60;
+        
+        const checkFPS = () => {
+            const currentTime = performance.now();
+            frameCount++;
+            
+            if (currentTime >= lastTime + 1000) {
+                currentFPS = Math.round((frameCount * 1000) / (currentTime - lastTime));
+                frameCount = 0;
+                lastTime = currentTime;
+                
+                // 如果FPS过低，尝试优化
+                if (currentFPS < 30) {
+                    this.triggerLowFPSOptimization();
+                }
+            }
+            
+            requestAnimationFrame(checkFPS);
+        };
+        
+        checkFPS();
+    },
+    
+    triggerLowFPSOptimization: function() {
+        console.log('检测到低FPS，进行优化...');
+        
+        // 简化UI元素
+        const complexElements = document.querySelectorAll('.thought-node, .model-card');
+        if (complexElements.length > 20) {
+            complexElements.forEach((el, index) => {
+                if (index > 20) {
+                    el.style.opacity = '0.8';
+                }
+            });
+        }
+    },
+    
+    handleScrollEnd: function() {
+        // 滚动结束后可以执行一些操作
+        // 例如：加载更多内容、更新位置等
+    }
+};
