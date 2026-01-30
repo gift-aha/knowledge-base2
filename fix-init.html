@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>初始化测试</title>
+    <script>
+        // 测试 MobileDataManager 的各种情况
+        console.log('=== 测试 MobileDataManager 的各种情况 ===');
+        
+        // 情况1: 完全未定义
+        try {
+            if (!MobileDataManager.isMobile()) return;
+            console.log('情况1: 正常');
+        } catch (e) {
+            console.log('情况1: 错误 -', e.message);
+        }
+        
+        // 情况2: 定义了但没有 isMobile 方法
+        window.MobileDataManager = {};
+        try {
+            if (!MobileDataManager.isMobile()) return;
+            console.log('情况2: 正常');
+        } catch (e) {
+            console.log('情况2: 错误 -', e.message);
+        }
+        
+        // 情况3: 正确定义
+        window.MobileDataManager = {
+            isMobile: function() { return true; }
+        };
+        try {
+            if (!MobileDataManager.isMobile()) return;
+            console.log('情况3: 正常');
+        } catch (e) {
+            console.log('情况3: 错误 -', e.message);
+        }
+        
+        // 情况4: 使用安全检查
+        function safeInit() {
+            if (typeof MobileDataManager === 'undefined') {
+                console.log('情况4: MobileDataManager 未定义');
+                return false;
+            }
+            if (typeof MobileDataManager.isMobile !== 'function') {
+                console.log('情况4: isMobile 不是函数');
+                return false;
+            }
+            if (!MobileDataManager.isMobile()) return false;
+            return true;
+        }
+        
+        console.log('情况4: 安全检查结果 -', safeInit());
+    </script>
+</head>
+<body>
+    <h1>初始化测试页面</h1>
+</body>
+</html>
