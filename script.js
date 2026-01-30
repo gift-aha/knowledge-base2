@@ -3640,4 +3640,24 @@ function sanitizeInput(input) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#x27;');
 }
+const Security = {
+  // 1. XSS防护函数
+  sanitize: function(input) {
+    if (!input) return '';
+    const div = document.createElement('div');
+    div.textContent = input;
+    return div.innerHTML;
+  },
+  
+  // 2. 数据验证函数
+  validateThoughtId: function(id) {
+    if (!id || typeof id !== 'string') return false;
+    return /^#[0-9]+$/.test(id.trim());
+  },
+  
+  // 3. 防止脚本注入
+  safeSetInnerHTML: function(element, content) {
+    element.textContent = content;
+  }
+};
 });
