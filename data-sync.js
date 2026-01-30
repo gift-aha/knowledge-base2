@@ -3,7 +3,7 @@ console.log('data-sync.js 已加载');
 
 const GitHubDataSync = {
     // 您的GitHub Pages URL（需要修改！）
-    dataUrl: 'https://YOUR_USERNAME.github.io/YOUR_REPO_NAME/thought-data.json',
+    dataUrl: 'https://gift-aha.github.io/knowledge-base2/thought-data.json',
     
     // 初始化
     init: function() {
