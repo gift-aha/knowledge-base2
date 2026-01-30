@@ -935,3 +935,84 @@ html {
 .mobile-sidebar-content::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera */
 }
+/* ==================== GitHub数据同步样式（移动端） ==================== */
+
+/* 数据更新时间显示 */
+.data-update-time {
+    font-size: 12px;
+    color: #666;
+    padding: 8px 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin: 10px;
+    display: none;
+    text-align: center;
+    border: 1px solid #e0e0e0;
+}
+
+/* 数据加载错误提示 */
+.data-load-error {
+    background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+    border: 2px solid #ff9800;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 15px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.data-load-error p {
+    margin: 10px 0;
+    color: #856404;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.data-load-error i {
+    color: #ff9800;
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.retry-btn {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 25px;
+    margin-top: 15px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.retry-btn:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+}
+
+/* 在移动端隐藏电脑端的导出按钮 */
+.github-export-btn {
+    display: none !important;
+}
+
+/* 如果您的移动端导航在顶部，可以这样添加更新时间 */
+.mobile-top-nav .data-update-time {
+    margin: 5px 15px;
+    font-size: 11px;
+    padding: 5px 10px;
+}
+
+/* 如果使用之前的底部导航方案 */
+.mobile-bottom-nav .data-update-time {
+    position: absolute;
+    top: -40px;
+    left: 10px;
+    right: 10px;
+    font-size: 11px;
+}
