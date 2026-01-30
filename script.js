@@ -3794,4 +3794,30 @@ UIManager.importDataFromFile = function(file) {
     };
     reader.readAsText(file);
 };
+init: function() {
+    // 原有初始化代码...
+    
+    // 初始化移动端数据管理
+    MobileDataManager.init();
+    
+    // 添加移动端特定功能
+    this.setupMobileFeatures();
+},
+
+setupMobileFeatures: function() {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        // 移动端特定功能设置
+        console.log('移动端模式启用');
+        
+        // 检查数据完整性
+        const integrity = MobileDataManager.checkDataIntegrity();
+        if (!integrity.valid) {
+            setTimeout(() => {
+                this.showAlert(`数据完整性检查: ${integrity.reason}`, 'warning');
+            }, 3000);
+        }
+    }
+},
 });
