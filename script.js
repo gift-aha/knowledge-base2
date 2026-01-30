@@ -3773,3 +3773,233 @@ const MobileDataManager = {
     }
 };
 });
+// ==================== 移动端数据同步优化 ====================
+const MobileDataSync = {
+    // 初始化数据同步
+    init: function() {
+        if (!MobileDataManager.isMobile()) return;
+        
+        // 检查数据一致性
+        this.checkDataConsistency();
+        
+        // 设置自动同步提醒
+        this.setupSyncReminder();
+        
+        // 添加数据同步UI
+        this.addSyncUI();
+    },
+    
+    // 检查数据一致性
+    checkDataConsistency: function() {
+        const data = localStorage.getItem('structuredThoughtAssistant');
+        if (!data) return;
+        
+        try {
+            const parsed = JSON.parse(data);
+            
+            // 检查数据量是否异常
+            const thoughtCount = parsed.thoughts ? parsed.thoughts.length : 0;
+            const modelCount = parsed.models ? parsed.models.length : 0;
+            
+            // 如果数据量过大，提示清理
+            if (thoughtCount > 1000 || modelCount > 100) {
+                this.showCleanupPrompt(thoughtCount, modelCount);
+            }
+            
+            // 检查数据格式
+            this.validateDataFormat(parsed);
+            
+        } catch (error) {
+            console.error('数据解析错误:', error);
+        }
+    },
+    
+    // 显示清理提示
+    showCleanupPrompt: function(thoughtCount, modelCount) {
+        setTimeout(() => {
+            if (confirm(`检测到数据量较大（思维: ${thoughtCount}，模型: ${modelCount}），这可能导致移动端性能下降。是否进行数据优化？`)) {
+                this.optimizeMobileData();
+            }
+        }, 3000);
+    },
+    
+    // 优化移动端数据
+    optimizeMobileData: function() {
+        const data = JSON.parse(localStorage.getItem('structuredThoughtAssistant'));
+        
+        // 1. 清理过时的草稿和临时数据
+        if (data.thoughts) {
+            data.thoughts = data.thoughts.filter(thought => 
+                !thought.isDraft || 
+                (new Date() - new Date(thought.updatedAt)) < 7 * 24 * 60 * 60 * 1000 // 保留7天内的草稿
+            );
+        }
+        
+        // 2. 压缩大文本内容
+        if (data.thoughts) {
+            data.thoughts.forEach(thought => {
+                if (thought.content && thought.content.length > 10000) {
+                    thought.content = thought.content.substring(0, 10000) + '... [内容已截断]';
+                }
+            });
+        }
+        
+        // 3. 保存优化后的数据
+        localStorage.setItem('structuredThoughtAssistant', JSON.stringify(data));
+        
+        alert('数据优化完成！已清理临时数据并压缩大文本内容。');
+    },
+    
+    // 验证数据格式
+    validateDataFormat: function(data) {
+        // 确保必要字段存在
+        if (!data.thoughts) data.thoughts = [];
+        if (!data.models) data.models = [];
+        if (!data.settings) data.settings = {};
+        
+        // 添加移动端标记
+        data.settings.mobileOptimized = true;
+        data.settings.lastMobileSync = new Date().toISOString();
+        
+        // 保存更新后的数据
+        localStorage.setItem('structuredThoughtAssistant', JSON.stringify(data));
+    },
+    
+    // 设置同步提醒
+    setupSyncReminder: function() {
+        const lastSync = localStorage.getItem('lastDesktopSync');
+        const now = new Date().getTime();
+        
+        // 如果超过7天没有同步，提醒用户
+        if (!lastSync || (now - parseInt(lastSync)) > 7 * 24 * 60 * 60 * 1000) {
+            setTimeout(() => {
+                this.showSyncNotification();
+            }, 10000);
+        }
+    },
+    
+    // 显示同步通知
+    showSyncNotification: function() {
+        const notification = document.createElement('div');
+        notification.className = 'sync-notification';
+        notification.innerHTML = `
+            <div class="sync-notice">
+                <i class="fas fa-sync-alt"></i>
+                <div class="sync-text">
+                    <strong>数据同步提醒</strong>
+                    <p>建议与电脑端同步数据以确保一致性</p>
+                </div>
+                <button class="sync-close" onclick="this.parentElement.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="sync-actions">
+                <button class="sync-btn" onclick="MobileDataSync.exportForSync()">
+                    <i class="fas fa-download"></i> 导出数据
+                </button>
+                <button class="sync-btn" onclick="MobileDataSync.showSyncHelp()">
+                    <i class="fas fa-question-circle"></i> 同步帮助
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // 10秒后自动隐藏
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 30000);
+    },
+    
+    // 导出用于同步的数据
+    exportForSync: function() {
+        const data = localStorage.getItem('structuredThoughtAssistant');
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `thought-assistant-sync-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        
+        URL.revokeObjectURL(url);
+        
+        // 更新同步时间
+        localStorage.setItem('lastDesktopSync', new Date().getTime().toString());
+    },
+    
+    // 显示同步帮助
+    showSyncHelp: function() {
+        const helpHTML = `
+            <div class="sync-help-modal">
+                <div class="help-content">
+                    <h3><i class="fas fa-sync"></i> 数据同步指南</h3>
+                    <p>为了确保移动端和电脑端数据一致，请按照以下步骤操作：</p>
+                    <ol>
+                        <li>在电脑端导出完整数据文件</li>
+                        <li>通过邮件、云盘或数据线将文件传输到手机</li>
+                        <li>在移动端点击"导入数据"选择文件</li>
+                        <li>建议每周同步一次数据</li>
+                    </ol>
+                    <div class="help-tips">
+                        <h4>注意事项：</h4>
+                        <ul>
+                            <li>避免同时在两端修改数据</li>
+                            <li>导入前备份当前数据</li>
+                            <li>确保导入文件格式正确</li>
+                        </ul>
+                    </div>
+                    <button class="btn-primary close-help">我知道了</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', helpHTML);
+        
+        document.querySelector('.close-help').addEventListener('click', () => {
+            document.querySelector('.sync-help-modal').remove();
+        });
+    },
+    
+    // 添加同步UI
+    addSyncUI: function() {
+        // 在数据管理页面添加同步选项
+        const observer = new MutationObserver(() => {
+            const dataManagement = document.querySelector('[data-view="data-management"], #data-management');
+            if (dataManagement && !dataManagement.querySelector('.mobile-sync-section')) {
+                const syncSection = `
+                    <div class="mobile-sync-section" style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                        <h4><i class="fas fa-mobile-alt"></i> 移动端数据同步</h4>
+                        <p style="margin: 10px 0; color: #666;">确保与电脑端数据一致</p>
+                        <div class="sync-controls">
+                            <button class="sync-btn" onclick="MobileDataSync.exportForSync()" style="margin-right: 10px;">
+                                <i class="fas fa-download"></i> 导出同步文件
+                            </button>
+                            <button class="sync-btn secondary" onclick="MobileDataSync.showSyncHelp()">
+                                <i class="fas fa-question-circle"></i> 同步帮助
+                            </button>
+                        </div>
+                        <div class="sync-status" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
+                            <p><i class="fas fa-info-circle"></i> 上次同步: ${this.getLastSyncTime()}</p>
+                        </div>
+                    </div>
+                `;
+                
+                dataManagement.insertAdjacentHTML('afterbegin', syncSection);
+            }
+        });
+        
+        observer.observe(document.body, { childList: true, subtree: true });
+    },
+    
+    // 获取上次同步时间
+    getLastSyncTime: function() {
+        const lastSync = localStorage.getItem('lastDesktopSync');
+        if (!lastSync) return '从未同步';
+        
+        const date = new Date(parseInt(lastSync));
+        return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+    }
+};
