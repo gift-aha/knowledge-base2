@@ -3700,23 +3700,26 @@ function saveTimelineEdit() {
 }
 
 // ==================== 初始化 ====================
+// 在DOM加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
-    UIManager.init();
-});
-const originalCreateElement = document.createElement;
-document.createElement = function(tagName) {
-    const element = originalCreateElement.call(document, tagName);
-    const originalSetAttribute = element.setAttribute;
-    element.setAttribute = function(name, value) {
-        // 阻止危险属性
-        if (name.startsWith('on') || name === 'href' && value.startsWith('javascript:')) {
-            console.warn('Blocked potentially dangerous attribute:', name, value);
-            return;
+    // 如果是移动端，从GitHub加载数据
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        GitHubDataSync.init();
+    }
+    
+    // 在电脑端，添加导出按钮（如果不存在）
+    if (!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        if (!document.getElementById('github-export-btn')) {
+            const exportBtn = document.createElement('button');
+            exportBtn.id = 'github-export-btn';
+            exportBtn.className = 'github-export-btn';
+            exportBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> 导出到GitHub';
+            exportBtn.onclick = GitHubDataSync.exportDataForGitHub;
+            exportBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 1000; padding: 10px 15px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;';
+            document.body.appendChild(exportBtn);
         }
-        return originalSetAttribute.call(this, name, value);
-    };
-    return element;
-};
+    }
+});
 
 // 点击模态框外部关闭
 document.addEventListener('click', function(event) {
