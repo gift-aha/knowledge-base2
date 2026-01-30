@@ -926,6 +926,12 @@ const UIManager = {
     init: function() {
         // 初始化数据存储
         DataStore.init();
+            init: function() {
+                const isFirstVisit = !localStorage.getItem('hasVisitedBefore');
+                
+                if (isFirstVisit) {
+                    localStorage.setItem('hasVisitedBefore', 'true');               
+            }
         
         // 设置导航点击事件
         this.setupNavigation();
