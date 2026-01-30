@@ -3609,6 +3609,20 @@ function saveTimelineEdit() {
 document.addEventListener('DOMContentLoaded', function() {
     UIManager.init();
 });
+const originalCreateElement = document.createElement;
+document.createElement = function(tagName) {
+    const element = originalCreateElement.call(document, tagName);
+    const originalSetAttribute = element.setAttribute;
+    element.setAttribute = function(name, value) {
+        // 阻止危险属性
+        if (name.startsWith('on') || name === 'href' && value.startsWith('javascript:')) {
+            console.warn('Blocked potentially dangerous attribute:', name, value);
+            return;
+        }
+        return originalSetAttribute.call(this, name, value);
+    };
+    return element;
+};
 
 // 点击模态框外部关闭
 document.addEventListener('click', function(event) {
