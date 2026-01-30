@@ -87,19 +87,113 @@ const DataStore = {
                 this.lastSaved = data.lastSaved || new Date().toISOString();
                 this.timeline = data.timeline || this.timeline;
                 
-                // 保存初始版本数据
-                this.saveInitialData();
-                console.log('数据加载成功');
+                                console.log('从 localStorage 加载数据成功');
             } catch (e) {
-                console.log('解析失败，使用默认数据', e);
+                console.log('解析 localStorage 失败，使用默认数据', e);
                 this.addExampleData();
             }
         } else {
-            this.addExampleData();
+            // 如果没有 localStorage 数据，尝试从 GitHub Pages 文件加载
+            this.loadFromGitHubPages();
         }
         
         this.save();
         this.updateUIStats();
+    },
+    
+    loadFromGitHubPages: function() {
+        // 使用 fetch 从 GitHub Pages 文件加载数据
+        fetch(this.dataFileUrl + '?t=' + Date.now())
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('网络响应不正常');
+            })
+            .then(data => {
+                this.thoughts = data.thoughts || [];
+                this.models = data.models || [];
+                this.tags = data.tags || {};
+                this.nextThoughtId = data.nextThoughtId || 124;
+                this.nextModelId = data.nextModelId || 81;
+                this.currentVersion = data.currentVersion || "v22.48";
+                this.lastSaved = data.lastSaved || new Date().toISOString();
+                this.timeline = data.timeline || this.timeline;
+                
+                console.log('从 GitHub Pages 文件加载数据成功');
+                this.save(); // 保存到 localStorage 以加速下次访问
+                this.updateUIStats();
+            })
+            .catch(error => {
+                console.log('从 GitHub Pages 加载数据失败，使用默认数据:', error);
+                this.addExampleData();
+            });
+    },
+    
+    save: function() {
+        const data = {
+            thoughts: this.thoughts,
+            models: this.models,
+            tags: this.tags,
+            nextThoughtId: this.nextThoughtId,
+            nextModelId: this.nextModelId,
+            currentVersion: this.currentVersion,
+            lastSaved: new Date().toISOString(),
+            timeline: this.timeline
+        };
+        
+        // 1. 保存到 localStorage（快速访问）
+        try {
+            localStorage.setItem('structuredThoughtAssistant', JSON.stringify(data));
+            console.log('数据已保存到 localStorage');
+        } catch (e) {
+            console.error('保存到 localStorage 失败:', e);
+        }
+        
+        // 2. 尝试保存到 GitHub Pages 文件（同步到所有设备）
+        this.saveToGitHubPages(data);
+        
+        return true;
+    },
+    
+    saveToGitHubPages: function(data) {
+        // 这个方法只能在前端展示数据，实际写入需要后端
+        // 这里我们提供一个导出功能，让用户手动上传到 GitHub
+        console.log('提示：请将以下数据保存到 GitHub 仓库的 /data/thoughts-data.json 文件中以同步到所有设备:');
+        console.log(JSON.stringify(data, null, 2));
+        
+        // 显示提示信息
+        this.showSyncInstructions(data);
+    },
+    
+    showSyncInstructions: function(data) {
+        // 在页面上显示同步说明
+        const instruction = `
+            <div class="alert alert-info" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; max-width: 400px; display: none;" id="sync-instruction">
+                <h5><i class="fas fa-sync"></i> 数据同步提示</h5>
+                <p>为使手机和电脑数据一致，请：</p>
+                <ol style="margin-left: 20px; font-size: 0.9rem;">
+                    <li>下载 <a href="#" onclick="downloadSyncFile()">data.json</a></li>
+                    <li>上传到 GitHub 仓库的 <code>/data/thoughts-data.json</code></li>
+                    <li>其他设备会自动加载最新数据</li>
+                </ol>
+                <button onclick="hideSyncInstruction()" class="btn btn-sm btn-secondary" style="margin-top: 10px;">知道了</button>
+            </div>
+        `;
+        
+        // 将指令添加到页面
+        if (!document.getElementById('sync-instruction')) {
+            document.body.insertAdjacentHTML('beforeend', instruction);
+        }
+        
+        // 保存数据到全局变量供下载使用
+        window.syncData = data;
+        
+        // 显示提示（5秒后显示）
+        setTimeout(() => {
+            const element = document.getElementById('sync-instruction');
+            if (element) element.style.display = 'block';
+        }, 5000);
     },
     
     // 保存初始版本数据
@@ -5017,3 +5111,28 @@ const MobileNavManager = {
         }, 100);
     }
 };
+// 新增下载同步文件的函数
+function downloadSyncFile() {
+    if (!window.syncData) {
+        alert('没有可同步的数据');
+        return;
+    }
+    
+    const dataStr = JSON.stringify(window.syncData, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'thoughts-data.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    alert('文件已下载，请上传到 GitHub 仓库的 /data/ 目录下');
+}
+
+function hideSyncInstruction() {
+    const element = document.getElementById('sync-instruction');
+    if (element) element.style.display = 'none';
+}
