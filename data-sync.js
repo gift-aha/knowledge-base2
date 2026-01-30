@@ -10,7 +10,7 @@ const GitHubDataSync = {
         console.log('GitHubDataSync 初始化');
         
         // 检查设备类型
-        const isMobile = this.is MobileDevice();
+        const is Mobile = this.is MobileDevice();
         console.log('设备检测结果:', isMobile ? '移动端' : '电脑端');
         
         if (isMobile) {
