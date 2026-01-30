@@ -368,7 +368,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ==================== GitHub Pages 数据同步模块 ====================
 const GitHubDataSync = {
     // 数据文件的URL
-    dataUrl: 'https://[你的用户名].github.io/[仓库名]/thought-data.json',
+    dataUrl: 'https://gift-aha.github.io/knowledge-base2/thought-data.json',
     
     // 初始化数据同步
     init: function() {
