@@ -3688,6 +3688,32 @@ const MobileDataManager = {
         
         // 添加自动备份提醒
         this.setupAutoBackupReminder();
+            // 移动端初始化
+            if (window.innerWidth <= 1024) {
+                this.initMobile();
+            }
+            
+            // 监听窗口大小变化
+            window.addEventListener('resize', () => {
+                if (window.innerWidth <= 1024 && !this.isMobileInitialized) {
+                    this.initMobile();
+                }
+            });       
+    },
+    initMobile: function() {
+        this.isMobileInitialized = true;
+        console.log('移动端模式已激活');
+        
+        // 隐藏桌面端元素，显示移动端元素
+        document.querySelectorAll('.desktop-only').forEach(el => {
+            el.style.display = 'none';
+        });
+        
+        // 调整内容区域间距
+        const contentArea = document.getElementById('content-area');
+        if (contentArea) {
+            contentArea.style.paddingTop = '80px';
+        }
     },
     
     addDataWarning: function() {
