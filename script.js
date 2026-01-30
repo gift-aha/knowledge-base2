@@ -3674,4 +3674,124 @@ const Security = {
     element.textContent = content;
   }
 };
+// ==================== 移动端数据管理组件 ====================
+const MobileDataManager = {
+    isMobile: function() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    },
+    
+    init: function() {
+        if (!this.isMobile()) return;
+        
+        // 添加移动端数据警告
+        this.addDataWarning();
+        
+        // 添加自动备份提醒
+        this.setupAutoBackupReminder();
+    },
+    
+    addDataWarning: function() {
+        // 在页面加载时显示移动端数据警告
+        setTimeout(() => {
+            if (!sessionStorage.getItem('mobileDataWarningShown')) {
+                const warningHtml = `
+                    <div class="mobile-data-warning">
+                        <h4><i class="fas fa-exclamation-triangle"></i> 移动端使用重要提示</h4>
+                        <p>在移动设备上，浏览器可能会定期清理本地存储数据。建议您：</p>
+                        <ol>
+                            <li>定期使用"数据管理"功能导出数据到文件</li>
+                            <li>将导出的文件保存到云盘或手机存储</li>
+                            <li>更换设备或浏览器时，导入之前保存的数据文件</li>
+                        </ol>
+                        <div class="mobile-data-actions">
+                            <button class="mobile-btn export" onclick="UIManager.exportAllData()">
+                                <i class="fas fa-download"></i> 立即导出数据
+                            </button>
+                            <button class="mobile-btn import" onclick="document.getElementById('mobile-file-input').click()">
+                                <i class="fas fa-upload"></i> 导入数据文件
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                // 在内容区域顶部添加警告
+                const contentArea = document.getElementById('content-area');
+                if (contentArea) {
+                    const loading = contentArea.querySelector('#loading');
+                    if (loading) {
+                        loading.insertAdjacentHTML('afterend', warningHtml);
+                    } else {
+                        contentArea.insertAdjacentHTML('afterbegin', warningHtml);
+                    }
+                }
+                
+                // 添加隐藏的文件输入
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.id = 'mobile-file-input';
+                fileInput.accept = '.json';
+                fileInput.style.display = 'none';
+                fileInput.onchange = (e) => {
+                    UIManager.importDataFromFile(e.target.files[0]);
+                };
+                document.body.appendChild(fileInput);
+                
+                sessionStorage.setItem('mobileDataWarningShown', 'true');
+            }
+        }, 2000);
+    },
+    
+    setupAutoBackupReminder: function() {
+        // 每24小时提醒备份一次
+        const lastBackupReminder = localStorage.getItem('lastBackupReminder');
+        const now = new Date().getTime();
+        
+        if (!lastBackupReminder || (now - lastBackupReminder) > 24 * 60 * 60 * 1000) {
+            setTimeout(() => {
+                if (confirm('距离上次数据备份已超过24小时，建议导出数据以防丢失。是否现在备份？')) {
+                    UIManager.exportAllData();
+                }
+                localStorage.setItem('lastBackupReminder', now.toString());
+            }, 5000);
+        }
+    },
+    
+    checkDataIntegrity: function() {
+        // 检查数据完整性
+        const data = localStorage.getItem('structuredThoughtAssistant');
+        if (!data) return { valid: false, reason: '无数据' };
+        
+        try {
+            const parsed = JSON.parse(data);
+            if (!parsed.thoughts || !parsed.models) {
+                return { valid: false, reason: '数据结构不完整' };
+            }
+            return { valid: true, count: parsed.thoughts.length + parsed.models.length };
+        } catch (e) {
+            return { valid: false, reason: '数据损坏' };
+        }
+    }
+};
+
+// 在 UIManager 中添加移动端导入方法
+UIManager.importDataFromFile = function(file) {
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        try {
+            const result = DataStore.importData(event.target.result);
+            if (result.success) {
+                this.showAlert('数据导入成功！', 'success');
+                this.loadView(this.currentView);
+                this.updateNetworkGraph();
+            } else {
+                this.showAlert('导入失败：' + result.error, 'error');
+            }
+        } catch (error) {
+            this.showAlert('文件格式错误：' + error.message, 'error');
+        }
+    };
+    reader.readAsText(file);
+};
 });
