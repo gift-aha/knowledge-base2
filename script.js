@@ -4468,3 +4468,441 @@ const MobileCSS = `
         100% { transform: rotate(360deg); }
     }
 `;
+// ==================== 移动端导航管理器 ====================
+const MobileNavManager = {
+    navType: 'bottom', // 默认底部导航: 'bottom', 'corner', 'gesture'
+    isExpanded: false,
+    
+    init: function() {
+        if (!MobileDataManager.isMobile()) return;
+        
+        // 检测用户之前的导航偏好
+        const savedNavType = localStorage.getItem('mobileNavType');
+        if (savedNavType) {
+            this.navType = savedNavType;
+        }
+        
+        // 移除原有导航栏
+        this.removeOriginalNav();
+        
+        // 根据类型初始化导航
+        this.initNavigation();
+        
+        // 添加导航样式切换按钮
+        this.addNavToggle();
+        
+        // 添加手势支持
+        this.addGestureSupport();
+    },
+    
+    removeOriginalNav: function() {
+        const desktopNav = document.querySelector('.desktop-nav, #main-nav, .sidebar');
+        if (desktopNav) {
+            desktopNav.style.display = 'none';
+        }
+    },
+    
+    initNavigation: function() {
+        switch(this.navType) {
+            case 'corner':
+                this.createCornerNavigation();
+                break;
+            case 'gesture':
+                this.createGestureNavigation();
+                break;
+            default:
+                this.createBottomNavigation();
+        }
+        
+        // 调整内容区域边距
+        this.adjustContentMargin();
+    },
+    
+    // 方案1: 底部导航栏
+    createBottomNavigation: function() {
+        const navHTML = `
+            <div class="mobile-bottom-nav" id="mobile-bottom-nav">
+                <div class="nav-items">
+                    <button class="nav-item active" data-view="thought-map">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>思维导图</span>
+                    </button>
+                    <button class="nav-item" data-view="data-management">
+                        <i class="fas fa-database"></i>
+                        <span>数据管理</span>
+                    </button>
+                    <button class="nav-item" data-view="model-manager">
+                        <i class="fas fa-robot"></i>
+                        <span>模型</span>
+                    </button>
+                    <button class="nav-item" data-view="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>设置</span>
+                    </button>
+                    <button class="nav-item more-btn" id="mobile-nav-more">
+                        <i class="fas fa-ellipsis-h"></i>
+                        <span>更多</span>
+                    </button>
+                </div>
+                <div class="more-menu" id="mobile-more-menu">
+                    <button class="more-item" data-view="export"><i class="fas fa-download"></i> 导出数据</button>
+                    <button class="more-item" data-view="import"><i class="fas fa-upload"></i> 导入数据</button>
+                    <button class="more-item" data-view="help"><i class="fas fa-question-circle"></i> 帮助</button>
+                    <button class="more-item" id="nav-style-toggle"><i class="fas fa-palette"></i> 切换导航样式</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', navHTML);
+        this.bindBottomNavEvents();
+    },
+        // 添加导航样式切换按钮
+    addNavToggle: function() {
+        // 样式切换弹窗
+        const styleModalHTML = `
+            <div class="nav-style-modal" id="nav-style-modal">
+                <div class="style-modal-content">
+                    <div class="style-modal-header">
+                        <h3>选择导航样式</h3>
+                        <button class="close-style-modal" id="close-style-modal">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="style-options">
+                        <div class="style-option ${this.navType === 'bottom' ? 'active' : ''}" data-style="bottom">
+                            <div class="style-preview bottom-preview"></div>
+                            <h4>底部导航</h4>
+                            <p>传统易用，固定显示</p>
+                        </div>
+                        <div class="style-option ${this.navType === 'corner' ? 'active' : ''}" data-style="corner">
+                            <div class="style-preview corner-preview"></div>
+                            <h4>角落悬浮</h4>
+                            <p>节省空间，点击展开</p>
+                        </div>
+                        <div class="style-option ${this.navType === 'gesture' ? 'active' : ''}" data-style="gesture">
+                            <div class="style-preview gesture-preview"></div>
+                            <h4>手势导航</h4>
+                            <p>边缘滑动，现代交互</p>
+                        </div>
+                    </div>
+                    <div class="style-modal-footer">
+                        <button class="btn-secondary" id="cancel-style-change">取消</button>
+                        <button class="btn-primary" id="apply-style-change">应用样式</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', styleModalHTML);
+        this.bindStyleModalEvents();
+    },
+    
+    // 调整内容区域边距
+    adjustContentMargin: function() {
+        const contentArea = document.getElementById('content-area');
+        if (!contentArea) return;
+        
+        // 移除原有边距
+        contentArea.style.marginBottom = '0';
+        contentArea.style.marginLeft = '0';
+        
+        // 根据导航类型添加边距
+        if (this.navType === 'bottom') {
+            contentArea.style.paddingBottom = '70px'; // 为底部导航留出空间
+        }
+    },
+    
+    // 切换导航样式
+    switchNavStyle: function(styleType) {
+        // 保存用户偏好
+        localStorage.setItem('mobileNavType', styleType);
+        this.navType = styleType;
+        
+        // 移除现有导航
+        const oldNav = document.querySelector('.mobile-bottom-nav, .mobile-corner-nav, .mobile-gesture-nav');
+        if (oldNav) {
+            oldNav.remove();
+        }
+        
+        // 重新初始化导航
+        this.initNavigation();
+    },
+    
+    // 数据同步优化
+    syncDataWithDesktop: function() {
+        // 解决移动端数据与电脑端不一致的问题
+        const mobileData = localStorage.getItem('structuredThoughtAssistant');
+        
+        // 检查数据版本
+        const dataVersion = localStorage.getItem('dataVersion') || '1.0';
+        const desktopVersion = sessionStorage.getItem('desktopDataVersion');
+        
+        if (desktopVersion && desktopVersion !== dataVersion) {
+            // 提示用户数据版本不一致
+            this.showSyncPrompt();
+        }
+        
+        // 清理可能的多余数据
+        this.cleanupExcessData();
+    },
+    
+    cleanupExcessData: function() {
+        // 清理可能存在的临时数据或重复数据
+        const keysToCheck = [
+            'tempThoughtData',
+            'draftThoughts',
+            'unsavedChanges',
+            'autoSaveBackup'
+        ];
+        
+        keysToCheck.forEach(key => {
+            if (localStorage.getItem(key)) {
+                localStorage.removeItem(key);
+            }
+        });
+    },
+    
+    // 绑定事件
+    bindBottomNavEvents: function() {
+        // 导航项点击
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                if (e.currentTarget.classList.contains('more-btn')) {
+                    const menu = document.getElementById('mobile-more-menu');
+                    menu.classList.toggle('show');
+                    return;
+                }
+                
+                const view = e.currentTarget.getAttribute('data-view');
+                UIManager.loadView(view);
+                
+                // 更新激活状态
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                e.currentTarget.classList.add('active');
+                
+                // 隐藏更多菜单
+                document.getElementById('mobile-more-menu').classList.remove('show');
+            });
+        });
+        
+        // 更多菜单项点击
+        document.querySelectorAll('.more-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const view = e.currentTarget.getAttribute('data-view');
+                if (view === 'export') {
+                    UIManager.exportAllData();
+                } else if (view === 'import') {
+                    document.getElementById('mobile-file-input').click();
+                } else if (e.currentTarget.id === 'nav-style-toggle') {
+                    document.getElementById('nav-style-modal').classList.add('show');
+                } else {
+                    UIManager.loadView(view);
+                }
+                
+                // 隐藏菜单
+                document.getElementById('mobile-more-menu').classList.remove('show');
+            });
+        });
+    },
+    
+    bindCornerNavEvents: function() {
+        const mainBtn = document.getElementById('corner-nav-main');
+        const menu = document.getElementById('corner-nav-menu');
+        
+        mainBtn.addEventListener('click', () => {
+            menu.classList.toggle('expanded');
+            mainBtn.classList.toggle('expanded');
+        });
+        
+        // 菜单项点击
+        document.querySelectorAll('.corner-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                if (e.currentTarget.id === 'nav-style-toggle') {
+                    document.getElementById('nav-style-modal').classList.add('show');
+                } else {
+                    const view = e.currentTarget.getAttribute('data-view');
+                    UIManager.loadView(view);
+                }
+                
+                // 关闭菜单
+                menu.classList.remove('expanded');
+                mainBtn.classList.remove('expanded');
+            });
+        });
+    },
+    
+    bindGestureNavEvents: function() {
+        const leftEdge = document.querySelector('.left-edge');
+        const rightEdge = document.querySelector('.right-edge');
+        const gestureMenu = document.getElementById('gesture-menu');
+        const closeBtn = document.getElementById('close-gesture');
+        
+        let startX, startY;
+        let edgeSwipe = false;
+        
+        // 边缘滑动检测
+        document.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            
+            // 检查是否从边缘开始
+            if (startX < 30 || startX > window.innerWidth - 30) {
+                edgeSwipe = true;
+            }
+        });
+        
+        document.addEventListener('touchmove', (e) => {
+            if (!edgeSwipe) return;
+            
+            const currentX = e.touches[0].clientX;
+            const diffX = currentX - startX;
+            
+            // 从左边缘向右滑动，或从右边缘向左滑动
+            if ((startX < 30 && diffX > 50) || 
+                (startX > window.innerWidth - 30 && diffX < -50)) {
+                e.preventDefault();
+                gestureMenu.classList.add('show');
+                edgeSwipe = false;
+            }
+        });
+        
+        document.addEventListener('touchend', () => {
+            edgeSwipe = false;
+        });
+        
+        // 关闭按钮
+        closeBtn.addEventListener('click', () => {
+            gestureMenu.classList.remove('show');
+        });
+        
+        // 菜单项点击
+        document.querySelectorAll('.gesture-item, .gesture-btn').forEach(item => {
+            item.addEventListener('click', (e) => {
+                if (e.currentTarget.id === 'nav-style-toggle') {
+                    document.getElementById('nav-style-modal').classList.add('show');
+                } else {
+                    const view = e.currentTarget.getAttribute('data-view');
+                    UIManager.loadView(view);
+                }
+                
+                // 关闭手势菜单
+                gestureMenu.classList.remove('show');
+            });
+        });
+    },
+    
+    bindStyleModalEvents: function() {
+        const modal = document.getElementById('nav-style-modal');
+        const closeBtn = document.getElementById('close-style-modal');
+        const cancelBtn = document.getElementById('cancel-style-change');
+        const applyBtn = document.getElementById('apply-style-change');
+        
+        let selectedStyle = this.navType;
+        
+        // 样式选项点击
+        document.querySelectorAll('.style-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.style-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                option.classList.add('active');
+                selectedStyle = option.getAttribute('data-style');
+            });
+        });
+        
+        // 关闭弹窗
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('show');
+        });
+        
+        cancelBtn.addEventListener('click', () => {
+            modal.classList.remove('show');
+        });
+        
+        // 应用样式
+        applyBtn.addEventListener('click', () => {
+            if (selectedStyle !== this.navType) {
+                this.switchNavStyle(selectedStyle);
+            }
+            modal.classList.remove('show');
+        });
+        
+        // 点击背景关闭
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+            }
+        });
+    },
+    
+    addGestureSupport: function() {
+        // 添加全局手势支持
+        let lastTouchEnd = 0;
+        
+        // 双击刷新
+        document.addEventListener('touchend', (event) => {
+            const now = Date.now();
+            if (now - lastTouchEnd < 300) {
+                // 双击处理
+                this.handleDoubleTap(event);
+            }
+            lastTouchEnd = now;
+        });
+        
+        // 长按菜单
+        let longPressTimer;
+        document.addEventListener('touchstart', (e) => {
+            longPressTimer = setTimeout(() => {
+                this.showContextMenu(e);
+            }, 800);
+        });
+        
+        document.addEventListener('touchend', () => {
+            clearTimeout(longPressTimer);
+        });
+    },
+    
+    handleDoubleTap: function(event) {
+        // 双击顶部回到顶部
+        if (event.touches[0].clientY < 100) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    },
+    
+    showContextMenu: function(event) {
+        // 显示上下文菜单
+        const menuHTML = `
+            <div class="mobile-context-menu" style="top: ${event.touches[0].clientY}px; left: ${event.touches[0].clientX}px">
+                <button class="context-item" onclick="UIManager.exportAllData()">
+                    <i class="fas fa-download"></i> 导出数据
+                </button>
+                <button class="context-item" onclick="document.getElementById('mobile-file-input').click()">
+                    <i class="fas fa-upload"></i> 导入数据
+                </button>
+                <button class="context-item" onclick="MobileNavManager.switchNavStyle('${this.navType === 'bottom' ? 'corner' : 'bottom'}')">
+                    <i class="fas fa-exchange-alt"></i> 切换导航
+                </button>
+                <button class="context-item" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i> 关闭
+                </button>
+            </div>
+        `;
+        
+        // 移除现有菜单
+        const existingMenu = document.querySelector('.mobile-context-menu');
+        if (existingMenu) existingMenu.remove();
+        
+        document.body.insertAdjacentHTML('beforeend', menuHTML);
+        
+        // 点击其他地方关闭
+        setTimeout(() => {
+            document.addEventListener('click', function closeMenu() {
+                const menu = document.querySelector('.mobile-context-menu');
+                if (menu) menu.remove();
+                document.removeEventListener('click', closeMenu);
+            });
+        }, 100);
+    }
+};
