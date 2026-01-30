@@ -4556,6 +4556,47 @@ const MobileNavManager = {
         document.body.insertAdjacentHTML('beforeend', navHTML);
         this.bindBottomNavEvents();
     },
+
+        // 方案2: 角落悬浮按钮导航
+    createCornerNavigation: function() {
+        const navHTML = `
+            <div class="mobile-corner-nav" id="mobile-corner-nav">
+                <button class="corner-nav-btn" id="corner-nav-main">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="corner-nav-menu" id="corner-nav-menu">
+                    <button class="corner-item" data-view="thought-map">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>思维导图</span>
+                    </button>
+                    <button class="corner-item" data-view="data-management">
+                        <i class="fas fa-database"></i>
+                        <span>数据管理</span>
+                    </button>
+                    <button class="corner-item" data-view="model-manager">
+                        <i class="fas fa-robot"></i>
+                        <span>模型管理</span>
+                    </button>
+                    <button class="corner-item" data-view="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>设置</span>
+                    </button>
+                    <button class="corner-item" data-view="export">
+                        <i class="fas fa-download"></i>
+                        <span>导出</span>
+                    </button>
+                    <button class="corner-item" id="nav-style-toggle">
+                        <i class="fas fa-palette"></i>
+                        <span>切换样式</span>
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', navHTML);
+        this.bindCornerNavEvents();
+    },
+    
         // 添加导航样式切换按钮
     addNavToggle: function() {
         // 样式切换弹窗
