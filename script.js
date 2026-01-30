@@ -5136,3 +5136,68 @@ function hideSyncInstruction() {
     const element = document.getElementById('sync-instruction');
     if (element) element.style.display = 'none';
 }
+// 导出数据供同步
+function exportForSync() {
+    const data = DataStore.exportAllData();
+    const compressed = LZString.compressToEncodedURIComponent(data);
+    
+    // 创建当前页面的同步链接
+    const currentUrl = window.location.origin + window.location.pathname;
+    const syncUrl = currentUrl + '?data=' + compressed;
+    
+    // 显示分享对话框
+    const shareDialog = `
+        <div class="modal-overlay" id="sync-modal" style="display: flex;">
+            <div class="modal">
+                <h3><i class="fas fa-sync"></i> 数据同步</h3>
+                <p>将此链接发送到其他设备即可同步数据：</p>
+                <textarea id="sync-url" style="width: 100%; height: 80px; margin: 15px 0;" readonly>${syncUrl}</textarea>
+                <button class="btn btn-primary" onclick="copySyncUrl()">
+                    <i class="fas fa-copy"></i> 复制链接
+                </button>
+                <button class="btn btn-secondary" onclick="closeSyncModal()" style="margin-left: 10px;">
+                    关闭
+                </button>
+                <p style="margin-top: 15px; font-size: 0.9rem; color: var(--text-light);">
+                    提示：在其他设备浏览器中打开此链接即可自动同步数据
+                </p>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', shareDialog);
+}
+
+function copySyncUrl() {
+    const textarea = document.getElementById('sync-url');
+    textarea.select();
+    document.execCommand('copy');
+    alert('链接已复制到剪贴板！');
+}
+
+function closeSyncModal() {
+    const modal = document.getElementById('sync-modal');
+    if (modal) modal.remove();
+}
+
+// 在页面加载时检查URL参数
+window.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedData = urlParams.get('data');
+    
+    if (sharedData) {
+        try {
+            const decompressed = LZString.decompressFromEncodedURIComponent(sharedData);
+            const data = JSON.parse(decompressed);
+            
+            if (confirm('检测到同步数据，是否加载？')) {
+                DataStore.importData(decompressed);
+                // 清除URL参数
+                window.history.replaceState({}, document.title, window.location.pathname);
+                location.reload();
+            }
+        } catch (e) {
+            console.error('同步数据解析失败:', e);
+        }
+    }
+});
