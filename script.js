@@ -73,6 +73,14 @@ const DataStore = {
     initialData: null,
     
     init: function() {
+            // 添加安全检查
+        if (typeof MobileDataManager === 'undefined' || 
+            typeof MobileDataManager.isMobile !== 'function') {
+            console.error('MobileDataManager 未正确定义，跳过移动端优化');
+            return;
+        }
+        
+        if (!MobileDataManager.isMobile()) return;
         const saved = localStorage.getItem('structuredThoughtAssistant');
         if (saved) {
             try {
