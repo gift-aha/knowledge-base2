@@ -7,6 +7,57 @@
     <title>思维协同处理器 - 智能解析增强版</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+     <!-- 新增移动端样式 -->
+    <link rel="stylesheet" href="mobile.css">
+</head>
+<body>
+    <!-- 移动端顶部导航栏 -->
+    <div class="mobile-header">
+        <div class="mobile-header-inner">
+            <div class="mobile-header-left">
+                <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <div class="mobile-logo">
+                    <span class="mobile-logo-icon">🧠</span>
+                    <span class="mobile-logo-text">思维协同</span>
+                </div>
+            </div>
+            
+            <div class="mobile-header-right">
+                <button class="mobile-search-toggle" id="mobile-search-toggle">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button class="mobile-view-toggle" id="mobile-view-toggle">
+                    <i class="fas fa-th-large"></i>
+                </button>
+            </div>
+        </div>
+                <!-- 移动端快捷视图切换 -->
+        <div class="mobile-view-switcher" id="mobile-view-switcher">
+            <div class="mobile-view-options">
+                <button class="mobile-view-option active" data-view="overview">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>概览</span>
+                </button>
+                <button class="mobile-view-option" data-view="thoughts">
+                    <i class="fas fa-list-ul"></i>
+                    <span>思考</span>
+                </button>
+                <button class="mobile-view-option" data-view="models">
+                    <i class="fas fa-cube"></i>
+                    <span>模型</span>
+                </button>
+                <button class="mobile-view-option" data-view="add-structured">
+                    <i class="fas fa-plus"></i>
+                    <span>新建</span>
+                </button>
+            </div>
+        </div>
+    </div>
+        
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="canonical" href="https://gift-aha.github.io/knowledge-base/">
@@ -35,7 +86,7 @@
 </head>
 <body>
     <!-- 顶部状态栏 -->
-    <div class="top-bar">
+    <div class="top-bar desktop-only">
         <div class="logo">
             <div class="logo-icon">🧠</div>
             <div class="logo-text">思维协同处理器</div>
@@ -193,6 +244,32 @@
         </div>
     </div>
 
+    <!-- 新增移动端底部导航 -->
+    <div class="mobile-bottom-nav">
+        <div class="mobile-bottom-nav-inner">
+            <a href="#" class="mobile-nav-item active" data-view="overview">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </a>
+            <a href="#" class="mobile-nav-item" data-view="thoughts">
+                <i class="fas fa-brain"></i>
+                <span>思考</span>
+            </a>
+            <a href="#" class="mobile-nav-item" data-view="models">
+                <i class="fas fa-cubes"></i>
+                <span>模型</span>
+            </a>
+            <a href="#" class="mobile-nav-item" data-view="add-structured">
+                <i class="fas fa-plus-circle"></i>
+                <span>新建</span>
+            </a>
+            <a href="#" class="mobile-nav-item" data-view="keywords">
+                <i class="fas fa-tags"></i>
+                <span>标签</span>
+            </a>
+        </div>
+    </div>
+    
     <!-- 确认删除模态框 -->
     <div id="delete-modal" class="modal-overlay" style="display: none;">
         <div class="modal">
@@ -329,20 +406,35 @@
     </div>
 
     <script src="script.js"></script>
-    <!-- 移动端导航头部 -->
-    <div class="mobile-nav-header">
-        <div class="mobile-nav-title">思维协同处理器</div>
-        <button class="mobile-nav-toggle" id="mobile-nav-toggle">
-            <i class="fas fa-bars"></i>
-        </button>
+
+        <!-- 新增移动端底部导航 -->
+    <div class="mobile-bottom-nav">
+        <div class="mobile-bottom-nav-inner">
+            <a href="#" class="mobile-nav-item active" data-view="overview">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </a>
+            <a href="#" class="mobile-nav-item" data-view="thoughts">
+                <i class="fas fa-brain"></i>
+                <span>思考</span>
+            </a>
+            <a href="#" class="mobile-nav-item" data-view="models">
+                <i class="fas fa-cubes"></i>
+                <span>模型</span>
+            </a>
+            <a href="#" class="mobile-nav-item" data-view="add-structured">
+                <i class="fas fa-plus-circle"></i>
+                <span>新建</span>
+            </a>
+            <a href="#" class="mobile-nav-item" data-view="keywords">
+                <i class="fas fa-tags"></i>
+                <span>标签</span>
+            </a>
+        </div>
     </div>
-    
-    <!-- 侧边栏遮罩 -->
-    <div class="sidebar-overlay" id="sidebar-overlay"></div>
-    
-    <!-- 原有侧边栏，添加 mobile-sidebar 类 -->
-    <div class="sidebar mobile-sidebar">
-        <!-- 原有侧边栏内容 -->
-    </div>
+
+        <script src="script.js"></script>
+    <!-- 新增移动端专用脚本 -->
+    <script src="mobile.js"></script>
 </body>
 </html>
