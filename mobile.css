@@ -1,0 +1,70 @@
+/* mobile.css */
+.mobile-nav-header {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .mobile-nav-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        background-color: var(--primary-color);
+        color: white;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+    
+    .mobile-nav-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+    
+    .mobile-nav-toggle {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+    
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 80%;
+        max-width: 300px;
+        height: 100vh;
+        z-index: 1001;
+        transition: left 0.3s ease;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+    }
+    
+    .sidebar.active {
+        left: 0;
+    }
+    
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 1000;
+    }
+    
+    .sidebar-overlay.active {
+        display: block;
+    }
+    
+    .main-container {
+        margin-top: 0;
+    }
+    
+    .top-bar {
+        display: none;
+    }
+}
