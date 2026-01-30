@@ -5204,3 +5204,22 @@ window.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+// 初始化GitHub数据同步
+document.addEventListener('DOMContentLoaded', function() {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        // 移动端：从GitHub加载数据
+        console.log('移动端设备，从GitHub加载数据');
+        GitHubDataSync.init();
+    } else {
+        // 电脑端：添加导出按钮事件
+        console.log('电脑端设备，启用GitHub导出功能');
+        const exportBtn = document.getElementById('github-export-btn');
+        if (exportBtn) {
+            exportBtn.onclick = function() {
+                GitHubDataSync.exportDataForGitHub();
+            };
+        }
+    }
+});
