@@ -43,6 +43,32 @@ body {
     flex-shrink: 0;
 }
 
+/* 添加在CSS文件适当位置，例如在.top-bar样式之后 */
+.sync-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.sync-btn {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.sync-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
 .logo {
     display: flex;
     align-items: center;
@@ -896,6 +922,65 @@ input[type="text"] {
     gap: 10px;
     margin-top: 20px;
     justify-content: flex-end;
+}
+
+/* 同步模态框样式 */
+.sync-modal {
+    max-width: 500px;
+    width: 90%;
+}
+
+.sync-url-container {
+    margin: 20px 0;
+}
+
+.sync-url-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 12px;
+    margin-bottom: 10px;
+    background-color: #f8f9fa;
+}
+
+.sync-qr-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.sync-qr-code {
+    width: 150px;
+    height: 150px;
+    background-color: #f8f9fa;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+}
+
+.sync-instructions {
+    background-color: #f0f7ff;
+    border-left: 3px solid var(--accent-color);
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 0 4px 4px 0;
+    font-size: 14px;
+}
+
+.sync-instructions ol {
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+.sync-instructions li {
+    margin-bottom: 5px;
 }
 
 /* 详情页分段样式 */
