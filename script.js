@@ -1,4 +1,3 @@
-//  数据结构与存储 
 const DataStore = {
     thoughts: [],
     models: [],
